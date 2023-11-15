@@ -6,7 +6,7 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import { protect, superAdmin } from "../middleware/authMiddleware.js";
-import upload from "../middleware/fileUploadMiddleware.js";
+// import upload from "../middleware/fileUploadMiddleware.js";
 
 // Register new user
 // POST: By admin/sponser
