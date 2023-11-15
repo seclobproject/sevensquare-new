@@ -199,13 +199,34 @@ router.post(
   })
 );
 
+
+// Set up Multer storage
+const storage = multer.diskStorage({
+  destination: './uploads',
+  filename: (req, file, cb) => {
+    const uniqueFilename = Date.now() + '-' + path.extname(file.originalname);
+    cb(null, uniqueFilename);
+  }
+});
+
+// Initialize Multer upload middleware
+const upload = multer({ storage: storage });
+
+
 // POST: User verification
 // After first/fresh user login
 router.post(
   "/verify-user",
   protect,
-  upload.single("file"),
+  upload.single("image"),
   asyncHandler(async (req, res) => {
+    
+    if (!req.file) {
+      res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const filePath = req.file.path;
+
     const { referenceNo } = req.body;
 
     const userId = req.user._id;
