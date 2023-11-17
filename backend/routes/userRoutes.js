@@ -194,25 +194,39 @@ router.post(
         userStatus: user.userStatus,
         children: user.children,
         token: token,
+        sts: "01",
+        msg: "Login Success",
       });
     } else {
-      res.status(401);
+      res.status(401).json({ sts: "00", msg: "Login failed" });
       throw new Error("Invalid email or password");
     }
   })
 );
 
 // Set up Multer storage
+// const storage = multer.diskStorage({
+//   destination: "./uploads",
+//   filename: (req, file, cb) => {
+//     const uniqueFilename = Date.now() + "-" + path.extname(file.originalname);
+//     cb(null, uniqueFilename);
+//   },
+// });
+
 const storage = multer.diskStorage({
-  destination: "./uploads",
-  filename: (req, file, cb) => {
-    const uniqueFilename = Date.now() + "-" + path.extname(file.originalname);
-    cb(null, uniqueFilename);
+  destination: function (req, file, cb) {
+    cb(null, "./uploads");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix);
   },
 });
 
-// Initialize Multer upload middleware
 const upload = multer({ storage: storage });
+
+// Initialize Multer upload middleware
+// const upload = multer({ storage: storage });
 
 // POST: User verification
 // After first/fresh user login
@@ -225,6 +239,8 @@ router.post(
       res.status(400).json({ message: "No file uploaded" });
     }
 
+    console.log(req.file);
+
     const filePath = req.file.path;
 
     const { referenceNo } = req.body;
@@ -234,7 +250,7 @@ router.post(
     const user = await User.findById(userId);
 
     if (user) {
-      user.screenshot = req.file.originalname;
+      user.screenshot = req.file.filename;
       user.referenceNo = referenceNo;
 
       const updatedUser = await user.save();
