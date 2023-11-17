@@ -193,6 +193,7 @@ router.post(
         unrealisedEarning: user.unrealisedEarning,
         userStatus: user.userStatus,
         children: user.children,
+        token_type: "Bearer",
         access_token: token,
         sts: "01",
         msg: "Login Success",
