@@ -36,13 +36,17 @@ function Login() {
     return formIsValid;
   };
 
-  const { isLoading, data:userData, isError } = useSelector(
-    (state) => state.getUserReducer
-  );
-  
-  if (userData) {
-    window.location.href = "/dashboard";
-  }
+  const {
+    isLoading,
+    data: userData,
+    isError,
+  } = useSelector((state) => state.getUserReducer);
+
+  useEffect(() => {
+    if (userData) {
+      window.location.href = "/dashboard";
+    }
+  }, [userData]);
 
   const loginSubmit = (e) => {
     e.preventDefault();

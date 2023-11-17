@@ -193,7 +193,7 @@ router.post(
         unrealisedEarning: user.unrealisedEarning,
         userStatus: user.userStatus,
         children: user.children,
-        token: token,
+        access_token: token,
         sts: "01",
         msg: "Login Success",
       });
@@ -238,8 +238,6 @@ router.post(
     if (!req.file) {
       res.status(400).json({ message: "No file uploaded" });
     }
-
-    console.log(req.file);
 
     const filePath = req.file.path;
 
