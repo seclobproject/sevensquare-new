@@ -45,6 +45,6 @@ app.use("/api/salary", salaryRoutes);
 app.use(errorHandler);
 app.use(notFound);
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 6000;
 
 app.listen(port, () => console.log(`Server running in ${port}`));

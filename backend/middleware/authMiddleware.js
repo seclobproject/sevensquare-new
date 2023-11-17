@@ -35,7 +35,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await User.findById(decoded.id).select("-password");
+      req.user = await User.findById(decoded.userId).select("-password");
 
       next();
     } catch (error) {
@@ -91,7 +91,7 @@ const superAdmin = asyncHandler(async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await User.findById(decoded.id).select("-password");
+      req.user = await User.findById(decoded.userId).select("-password");
 
       if (req.user.isSuperAdmin) {
         next();
@@ -113,4 +113,38 @@ const superAdmin = asyncHandler(async (req, res, next) => {
   }
 });
 
-export { protect, superAdmin };
+const verifyStatus = asyncHandler(async (req, res, next) => {
+  let token;
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      req.user = await User.findById(decoded.userId).select("-password");
+
+      if (req.user.userStatus == "approved") {
+        next();
+      } else {
+        console.error(error);
+        res.status(401);
+        throw new Error("User verification failed! Please verify first!");
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(401);
+      throw new Error("Not authenticated, token failed");
+    }
+  }
+
+  if (!token) {
+    res.status(401);
+    throw new Error("Not authenticated, No token");
+  }
+});
+
+export { protect, superAdmin, verifyStatus };

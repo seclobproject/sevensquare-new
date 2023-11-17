@@ -5,7 +5,11 @@ import Randomstring from "randomstring";
 import asyncHandler from "../middleware/asyncHandler.js";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
-import { protect, superAdmin } from "../middleware/authMiddleware.js";
+import {
+  protect,
+  superAdmin,
+  verifyStatus,
+} from "../middleware/authMiddleware.js";
 import multer from "multer";
 // import upload from "../middleware/fileUploadMiddleware.js";
 
@@ -172,8 +176,6 @@ router.post(
       //   maxAge: 1 * 24 * 60 * 60 * 1000,
       // });
 
-
-
       res.json({
         _id: user._id,
         sponser: user.sponser,
@@ -200,19 +202,17 @@ router.post(
   })
 );
 
-
 // Set up Multer storage
 const storage = multer.diskStorage({
-  destination: './uploads',
+  destination: "./uploads",
   filename: (req, file, cb) => {
-    const uniqueFilename = Date.now() + '-' + path.extname(file.originalname);
+    const uniqueFilename = Date.now() + "-" + path.extname(file.originalname);
     cb(null, uniqueFilename);
-  }
+  },
 });
 
 // Initialize Multer upload middleware
 const upload = multer({ storage: storage });
-
 
 // POST: User verification
 // After first/fresh user login
@@ -221,9 +221,8 @@ router.post(
   protect,
   upload.single("image"),
   asyncHandler(async (req, res) => {
-    
     if (!req.file) {
-      res.status(400).json({ message: 'No file uploaded' });
+      res.status(400).json({ message: "No file uploaded" });
     }
 
     const filePath = req.file.path;
@@ -251,7 +250,7 @@ router.post(
 // POST: Only for admin/sponser
 router.post(
   "/verify-user-payment",
-  protect,
+  superAdmin,
   asyncHandler(async (req, res) => {
     const sponserUserId = req.user._id;
 
@@ -280,6 +279,7 @@ router.post(
 // GET: All users to Super admin
 router.get(
   "/get-users",
+  superAdmin,
   asyncHandler(async (req, res) => {
     const users = await User.find().populate("packageChosen");
     res.json(users);
@@ -290,6 +290,7 @@ router.get(
 router.get(
   "/get-my-users",
   protect,
+  verifyStatus,
   asyncHandler(async (req, res) => {
     const sponser = req.user.ownSponserId;
 
@@ -303,6 +304,7 @@ router.get(
 router.put(
   "/edit-profile",
   protect,
+  verifyStatus,
   asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
@@ -310,7 +312,7 @@ router.put(
 
     const user = await User.findById(userId);
 
-    if(user){
+    if (user) {
       user.name = name;
       user.email = email;
       user.phone = phone;
@@ -331,21 +333,20 @@ router.put(
         .status(404)
         .json({ message: "Error occured! Please verify you are logged in!" });
     }
-
   })
 );
 
 // Logout user
-router.post(
-  "/logout",
-  asyncHandler(async (req, res) => {
-    res.cookie("jwt", "", {
-      httpOnly: true,
-      expires: new Date(0),
-    });
+// router.post(
+//   "/logout",
+//   asyncHandler(async (req, res) => {
+//     res.cookie("jwt", "", {
+//       httpOnly: true,
+//       expires: new Date(0),
+//     });
 
-    res.status(200).json({ message: "Logged out successfully" });
-  })
-);
+//     res.status(200).json({ message: "Logged out successfully" });
+//   })
+// );
 
 export default router;
