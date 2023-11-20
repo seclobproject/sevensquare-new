@@ -11,6 +11,8 @@ import {
   verifyStatus,
 } from "../middleware/authMiddleware.js";
 import multer from "multer";
+import { verify } from "crypto";
+import Package from "../models/packageModel.js";
 // import upload from "../middleware/fileUploadMiddleware.js";
 
 // Register new user
@@ -315,7 +317,6 @@ router.get(
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Retrieve the populated children array from the user document
     const childrenArray = users.children || [];
 
     if (childrenArray.length === 0) {
@@ -324,6 +325,59 @@ router.get(
         .res({ sts: "00", message: "No members found under you!" });
     } else {
       res.status(200).json({ children: childrenArray });
+    }
+  })
+);
+
+// GET: Get your users by ID
+router.get(
+  "/get-user-by-id/:id",
+  // protect,
+  // verifyStatus,
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const user = await User.findById(id).populate("children");
+
+    const childrenArray = user.children || [];
+
+    const updatedArray = await Promise.all(
+      childrenArray.map(async (child) => {
+        const packageSelected = await Package.findById(
+          child.packageChosen
+        ).lean();
+
+        if (packageSelected) {
+          const modifiedObject = {
+            ...child,
+            packageSelected: packageSelected.name,
+          };
+
+          // Remove Mongoose metadata
+          delete modifiedObject.__v;
+          delete modifiedObject._id;
+          delete modifiedObject.$__;
+          delete modifiedObject.$isNew;
+
+          return modifiedObject;
+        } else {
+          // Handle the case where Package.findById did not find a package
+          return child; // or handle it as per your requirements
+        }
+      })
+    );
+
+    const members = updatedArray.map((obj) => ({
+      ...obj._doc, // Spread the properties from _doc
+      packageSelected: obj.packageSelected,
+    }));
+
+    if (members) {
+      res.status(200).json({
+        members,
+      });
+    } else {
+      res.status(400).json({ sts: "00", message: "User not found" });
     }
   })
 );
