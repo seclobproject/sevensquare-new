@@ -360,10 +360,8 @@ router.get(
           delete modifiedObject.$isNew;
 
           return modifiedObject;
-        } else {
-          // Handle the case where Package.findById did not find a package
-          return child; // or handle it as per your requirements
         }
+        
       })
     );
 
@@ -377,7 +375,7 @@ router.get(
         members,
       });
     } else {
-      res.status(400).json({ sts: "00", message: "User not found" });
+      res.status(400).json({ sts: "00", message: "Members not found" });
     }
   })
 );
