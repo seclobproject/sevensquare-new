@@ -200,7 +200,7 @@ router.post(
       });
     } else {
       res.status(401).json({ sts: "00", msg: "Login failed" });
-      throw new Error("Invalid email or password");
+      // throw new Error("Invalid email or password");
     }
   })
 );
@@ -307,10 +307,24 @@ router.get(
   protect,
   verifyStatus,
   asyncHandler(async (req, res) => {
-    const sponser = req.user.ownSponserId;
+    const userId = req.user._id;
 
-    const users = await User.find({ sponser });
-    res.json(users);
+    const users = await User.findById(userId).populate("children");
+
+    if (!users) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Retrieve the populated children array from the user document
+    const childrenArray = users.children || [];
+
+    if (childrenArray.length === 0) {
+      res
+        .status(401)
+        .res({ sts: "00", message: "No members found under you!" });
+    } else {
+      res.status(200).json({ children: childrenArray });
+    }
   })
 );
 
