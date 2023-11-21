@@ -8,7 +8,7 @@ import User from "../models/userModel.js";
 import {
   protect,
   superAdmin,
-  verifyStatus,
+  protectVerifyStatus,
 } from "../middleware/authMiddleware.js";
 import multer from "multer";
 import { verify } from "crypto";
@@ -307,7 +307,7 @@ router.get(
 router.get(
   "/get-my-users",
   protect,
-  verifyStatus,
+  protectVerifyStatus,
   asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
@@ -332,8 +332,7 @@ router.get(
 // GET: Get your users by ID
 router.get(
   "/get-user-by-id/:id",
-  // protect,
-  // verifyStatus,
+  protectVerifyStatus,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
 
@@ -361,7 +360,6 @@ router.get(
 
           return modifiedObject;
         }
-        
       })
     );
 
@@ -372,6 +370,7 @@ router.get(
 
     if (members) {
       res.status(200).json({
+        sponserUser: user,
         members,
       });
     } else {
@@ -384,8 +383,7 @@ router.get(
 // Access to admin
 router.put(
   "/edit-profile",
-  protect,
-  verifyStatus,
+  protectVerifyStatus,
   asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
@@ -413,6 +411,39 @@ router.put(
       res
         .status(404)
         .json({ message: "Error occured! Please verify you are logged in!" });
+    }
+  })
+);
+
+// POST: Fetch profile of the user
+// Access to admin
+router.post(
+  "/fetch-profile",
+  protectVerifyStatus,
+  asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+
+    if (user) {
+      res.json({
+        _id: user._id,
+        sponser: user.sponser,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        ownSponserId: user.ownSponserId,
+        screenshot: user.screenshot,
+        referenceNo: user.referenceNo,
+        earning: user.earning,
+        unrealisedEarning: user.unrealisedEarning,
+        userStatus: user.userStatus,
+        sts: "01",
+        msg: "Login Success",
+      });
+    } else {
+      res.status(401).json({ sts: "00", msg: "User not found" });
     }
   })
 );

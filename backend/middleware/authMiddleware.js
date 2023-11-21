@@ -113,7 +113,7 @@ const superAdmin = asyncHandler(async (req, res, next) => {
   }
 });
 
-const verifyStatus = asyncHandler(async (req, res, next) => {
+const protectVerifyStatus = asyncHandler(async (req, res, next) => {
   let token;
 
   if (
@@ -131,13 +131,16 @@ const verifyStatus = asyncHandler(async (req, res, next) => {
         next();
       } else {
         console.error(error);
-        res.status(401);
-        throw new Error("User verification failed! Please verify first!");
+        res.status(401).json({
+          sts: "00",
+          message: "User verification failed! Please verify first!",
+        });
       }
     } catch (error) {
-      console.error(error);
-      res.status(401);
-      throw new Error("Not authenticated, token failed");
+      console.error(`The error is - ${error}🥲`);
+      res
+        .status(401)
+        .json({ sts: "00", message: "Not authenticated, token failed" });
     }
   }
 
@@ -147,4 +150,4 @@ const verifyStatus = asyncHandler(async (req, res, next) => {
   }
 });
 
-export { protect, superAdmin, verifyStatus };
+export { protect, superAdmin, protectVerifyStatus };
