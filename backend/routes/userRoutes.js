@@ -11,7 +11,6 @@ import {
   protectVerifyStatus,
 } from "../middleware/authMiddleware.js";
 import multer from "multer";
-import { verify } from "crypto";
 import Package from "../models/packageModel.js";
 // import upload from "../middleware/fileUploadMiddleware.js";
 
@@ -255,7 +254,15 @@ router.post(
       user.referenceNo = referenceNo;
 
       const updatedUser = await user.save();
-      res.json(updatedUser);
+      if (updatedUser) {
+        res
+          .status(201)
+          .json({ updatedUser, sts: "01", msg: "User verification success!" });
+      } else {
+        res
+          .status(400)
+          .json({ sts: "00", msg: "Verification failed. Please try again!" });
+      }
     } else {
       res.status(401);
       throw new Error("User not found");
@@ -359,14 +366,20 @@ router.get(
           delete modifiedObject.$isNew;
 
           return modifiedObject;
+        } else {
+          return null;
         }
       })
     );
 
-    const members = updatedArray.map((obj) => ({
-      ...obj._doc, // Spread the properties from _doc
-      packageSelected: obj.packageSelected,
-    }));
+    let members;
+
+    if (updatedArray) {
+      members = updatedArray.map((obj) => ({
+        ...obj._doc,
+        packageSelected: obj.packageSelected,
+      }));
+    }
 
     if (members) {
       res.status(200).json({

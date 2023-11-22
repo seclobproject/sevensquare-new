@@ -14,9 +14,24 @@ router.get(
     const packages = await Package.find();
 
     if (packages) {
-      res.json(packages);
+      const results = [];
+      packages.map((eachPack) => {
+        const result = {
+          id: eachPack._id,
+          packageName: eachPack.name,
+          amount: eachPack.amount,
+          amountExGST: eachPack.amountExGST,
+          usersCount: eachPack.usersCount,
+          addOnUsers: eachPack.addOnUsers,
+          schemeType: eachPack.schemeType,
+        };
+
+        results.push(result);
+      });
+
+      res.json({ sts: "01", msg: "Success", results });
     } else {
-      res.status(404).json({ message: "Packages not found!" });
+      res.status(404).json({ sts: "00", message: "Packages not found!" });
     }
   })
 );

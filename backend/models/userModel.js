@@ -1,6 +1,17 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+const transactionSchema = new mongoose.Schema(
+  {
+    referenceID: String,
+    amount: Number,
+    status: String
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const userSchema = new mongoose.Schema(
   {
     sponser: {
@@ -36,7 +47,7 @@ const userSchema = new mongoose.Schema(
     isAdmin: {
       type: Boolean,
       required: true,
-      default: false,
+      default: true,
     },
     isSuperAdmin: {
       type: Boolean,
@@ -58,13 +69,14 @@ const userSchema = new mongoose.Schema(
     },
     unrealisedSalary: {
       type: Number,
-      default: 0
+      default: 0,
     },
     unrealisedEarning: [
       {
-        type: Number
+        type: Number,
       },
     ],
+    transactions: [transactionSchema],
     userStatus: {
       type: String,
       enum: ["pending", "approved", "rejected"],

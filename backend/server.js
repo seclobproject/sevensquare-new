@@ -11,6 +11,7 @@ import packageRoutes from "./routes/packageRoutes.js";
 import commissionRoutes from "./routes/commissionRoutes.js";
 import salaryRoutes from "./routes/salaryRoutes.js";
 import pinRoutes from "./routes/pinRoutes.js";
+import walletRoutes from "./routes/walletRoutes.js";
 
 //dotenv
 import dotenv from "dotenv";
@@ -42,6 +43,7 @@ app.use("/api/packages", packageRoutes);
 app.use("/api/commission", commissionRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/pins", pinRoutes);
+app.use("/api/wallet", walletRoutes);
 // API Points
 
 app.use(errorHandler);

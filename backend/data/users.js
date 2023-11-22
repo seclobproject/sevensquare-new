@@ -16,6 +16,7 @@ const users = [
         referenceNo: null,
         earning: 0,
         unrealisedEarning: [],
+        transactions: [],
         userStatus: "approved",
         children: [],
         unrealisedSalary: 0
