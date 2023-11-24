@@ -3,13 +3,13 @@ import axios from "axios";
 
 // Redux action to get all the packages
 export const fetchPackage = createAsyncThunk("fetchPackage", async () => {
-  const response = await axios.get("/api/packages");
-  return response.data;
+  const response = await axios.get("http://localhost:6001/api/packages");
+  return response.data.results;
 });
 
 const initialState = {
   loading: false,
-  data: null,
+  data: [],
   error: false,
 };
 
@@ -17,7 +17,7 @@ export const packageSlice = createSlice({
   name: "package",
   initialState,
   extraReducers: (builder) => {
-    builder.addCase(fetchPackage.pending, (state, action) => {
+    builder.addCase(fetchPackage.pending, (state) => {
       state.loading = true;
       state.data = null;
       state.error = false;

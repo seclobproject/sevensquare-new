@@ -1,7 +1,7 @@
 {
   "name": "mosaic-react",
   "version": "0.1.0",
-  "proxy": "http://localhost:6000",
+  "proxy": "http://localhost:6001",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

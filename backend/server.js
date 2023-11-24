@@ -12,6 +12,7 @@ import commissionRoutes from "./routes/commissionRoutes.js";
 import salaryRoutes from "./routes/salaryRoutes.js";
 import pinRoutes from "./routes/pinRoutes.js";
 import walletRoutes from "./routes/walletRoutes.js";
+import franchiseRoutes from "./routes/franchiseRoutes.js";
 
 //dotenv
 import dotenv from "dotenv";
@@ -44,11 +45,12 @@ app.use("/api/commission", commissionRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/pins", pinRoutes);
 app.use("/api/wallet", walletRoutes);
+app.use("/api/franchise", franchiseRoutes);
 // API Points
 
 app.use(errorHandler);
 app.use(notFound);
 
-const port = process.env.PORT || 6000;
+const port = process.env.PORT || 6001;
 
 app.listen(port, () => console.log(`Server running in ${port}`));

@@ -59,9 +59,11 @@ const userSchema = new mongoose.Schema(
     },
     screenshot: {
       type: String,
+      default: null
     },
     referenceNo: {
       type: String,
+      default: null
     },
     earning: {
       type: Number,
@@ -76,6 +78,10 @@ const userSchema = new mongoose.Schema(
         type: Number,
       },
     ],
+    pinsLeft: {
+      type: Number,
+      required: true
+    },
     transactions: [transactionSchema],
     userStatus: {
       type: String,

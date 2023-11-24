@@ -5,12 +5,17 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import { protect, superAdmin } from "../middleware/authMiddleware.js";
 
 import Package from "../models/packageModel.js";
+import User from "../models/userModel.js";
 
 // GET: All packages
 // Access to all users
 router.get(
   "/",
+  protect,
   asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
     const packages = await Package.find();
 
     if (packages) {
@@ -29,7 +34,12 @@ router.get(
         results.push(result);
       });
 
-      res.json({ sts: "01", msg: "Success", results });
+      res.json({
+        sts: "01",
+        msg: "Success",
+        results,
+        userStatus: user.userStatus,
+      });
     } else {
       res.status(404).json({ sts: "00", message: "Packages not found!" });
     }

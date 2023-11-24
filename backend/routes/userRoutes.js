@@ -61,11 +61,19 @@ router.post(
 
     const ownSponserId = Randomstring.generate(7);
 
-    const { name, email, phone, address, packageChosen, password, isAdmin } =
+    const { name, email, phone, address, packageChosen, password } =
       req.body;
 
-    const screenshot = null;
-    const referenceNo = null;
+    const existingUser = await User.findOne({ email });
+    const existingUserByPhone = await User.findOne({ phone });
+
+    if (existingUser || existingUserByPhone) {
+      res.status(400);
+      throw new Error("User already exists!");
+    }
+
+    let screenshot = null;
+    let referenceNo = null;
 
     if (req.body.screenshot && req.body.referenceNo) {
       screenshot = req.body.screenshot;
@@ -75,12 +83,13 @@ router.post(
     const earning = 0;
     const unrealisedEarning = [];
     const children = [];
-    const existingUser = await User.findOne({ email });
-    const existingUserByPhone = await User.findOne({ phone });
 
-    if (existingUser || existingUserByPhone) {
-      res.status(400);
-      throw new Error("User already exists!");
+    if (packageChosen) {
+      const packageSelected = await Package.findById(packageChosen);
+
+      if(packageSelected){
+        const pinsLeft = packageSelected.usersCount + packageSelected.addOnUsers;
+      }
     }
 
     const user = await User.create({
@@ -95,6 +104,7 @@ router.post(
       ownSponserId,
       screenshot,
       referenceNo,
+      pinsLeft,
       earning,
       unrealisedEarning,
       userStatus,
@@ -140,6 +150,7 @@ router.post(
           screenshot: user.screenshot,
           referenceNo: user.referenceNo,
           earning: user.earning,
+          pinsLeft: user.pinsLeft,
           unrealisedEarning: user.unrealisedEarning,
           children: user.children,
           isAdmin: user.isAdmin,
@@ -152,7 +163,7 @@ router.post(
       }
     } else {
       res.status(400);
-      throw new Error("Invalid user data");
+      throw new Error("Registration failed. Please try again!");
     }
   })
 );
@@ -191,6 +202,7 @@ router.post(
         screenshot: user.screenshot,
         referenceNo: user.referenceNo,
         earning: user.earning,
+        pinsLeft: user.pinsLeft,
         unrealisedEarning: user.unrealisedEarning,
         userStatus: user.userStatus,
         children: user.children,
@@ -429,14 +441,14 @@ router.put(
 );
 
 // POST: Fetch profile of the user
-// Access to admin
+// Access to admin/user
 router.post(
   "/fetch-profile",
-  protectVerifyStatus,
+  protect,
   asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("packageChosen");
 
     if (user) {
       res.json({
@@ -452,8 +464,9 @@ router.post(
         earning: user.earning,
         unrealisedEarning: user.unrealisedEarning,
         userStatus: user.userStatus,
+        packageChosen: user.packageChosen.amount,
         sts: "01",
-        msg: "Login Success",
+        msg: "Profile fetched successfully",
       });
     } else {
       res.status(401).json({ sts: "00", msg: "User not found" });
