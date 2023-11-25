@@ -7,6 +7,7 @@ import User from "../models/userModel.js";
 import Worker from "../models/workerModel.js";
 import Package from "../models/packageModel.js";
 
+import Randomstring from "randomstring";
 // There will be N number of user pins available to someone who bought franchise
 
 // List N number of pins
@@ -50,7 +51,7 @@ router.get(
 // POST: The worker details will be send to Seclob
 // Access to user
 router.post(
-  "/api/franchise/sell-pin",
+  "/sell-pin",
   protect,
   asyncHandler(async (req, res) => {
     const userId = req.user._id;
@@ -58,6 +59,7 @@ router.post(
     const { name, phone, email, profession, district } = req.body;
 
     const user = await User.findById(userId).populate("packageChosen");
+    console.log(user);
 
     if (user) {
       const newWorker = await Worker.create({
@@ -69,6 +71,7 @@ router.post(
       });
 
       if (newWorker) {
+
         user.pinsLeft = user.pinsLeft - 1;
         await user.save();
 
@@ -100,7 +103,7 @@ router.post(
 // POST: The worker details will be send to Seclob
 // Access to user
 router.post(
-  "/api/franchise/register",
+  "/register",
   protect,
   asyncHandler(async (req, res) => {
     const sponser = req.user._id;
@@ -116,10 +119,9 @@ router.post(
     const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
 
     if (existingUser) {
-      res.status(400).json({ sts: "00", msg: "User not found!" });
+      res.status(400).json({ sts: "00", msg: "User has already registered!" });
     }
 
-    const earning = 0;
     const unrealisedEarning = [];
     const children = [];
     const packageChosen = await Package.findOne({ amount: 1000 });
@@ -130,15 +132,10 @@ router.post(
       email,
       phone,
       address,
-      packageChosen,
       password,
-      isAdmin,
-      ownSponserId,
-      screenshot,
-      referenceNo,
-      pinsLeft,
-      earning,
+      packageChosen,
       unrealisedEarning,
+      ownSponserId,
       userStatus,
       children,
     });
@@ -158,11 +155,7 @@ router.post(
           address: user.address,
           packageChosen: user.packageChosen,
           ownSponserId: user.ownSponserId,
-          earning: user.earning,
           pinsLeft: user.pinsLeft,
-          unrealisedEarning: user.unrealisedEarning,
-          children: user.children,
-          userStatus: user.userStatus,
         });
       } else {
         res.status(400);

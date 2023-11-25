@@ -36,7 +36,7 @@ router.post(
 );
 
 // POST: Use PIN/Add new User
-// Accessible to admin
+// Accessible to user
 router.post(
   "/add-user",
   protect,

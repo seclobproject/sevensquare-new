@@ -10,7 +10,7 @@ import userRoutes from "./routes/userRoutes.js";
 import packageRoutes from "./routes/packageRoutes.js";
 import commissionRoutes from "./routes/commissionRoutes.js";
 import salaryRoutes from "./routes/salaryRoutes.js";
-import pinRoutes from "./routes/pinRoutes.js";
+// import pinRoutes from "./routes/pinRoutes.js";
 import walletRoutes from "./routes/walletRoutes.js";
 import franchiseRoutes from "./routes/franchiseRoutes.js";
 
@@ -43,7 +43,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/packages", packageRoutes);
 app.use("/api/commission", commissionRoutes);
 app.use("/api/salary", salaryRoutes);
-app.use("/api/pins", pinRoutes);
+// app.use("/api/pins", pinRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/franchise", franchiseRoutes);
 // API Points

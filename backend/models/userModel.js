@@ -80,7 +80,8 @@ const userSchema = new mongoose.Schema(
     ],
     pinsLeft: {
       type: Number,
-      required: true
+      required: true,
+      default: 1
     },
     transactions: [transactionSchema],
     userStatus: {
