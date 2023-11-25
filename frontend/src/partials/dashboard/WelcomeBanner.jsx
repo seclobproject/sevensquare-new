@@ -48,7 +48,7 @@ function WelcomeBanner() {
       {/* Content */}
       <div className="relative">
         <h1 className="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold mb-1">Good afternoon, Acme Inc. 👋</h1>
-        <p className="dark:text-indigo-200">Here is what’s happening with your projects today:</p>
+        <p className="dark:text-indigo-200">Here is what's happening with your projects today:</p>
       </div>
     </div>
   );

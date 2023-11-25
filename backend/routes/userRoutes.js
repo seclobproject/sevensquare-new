@@ -172,11 +172,13 @@ router.post(
 router.post(
   "/login",
   asyncHandler(async (req, res) => {
+    
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
+
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
@@ -188,7 +190,7 @@ router.post(
       //   maxAge: 1 * 24 * 60 * 60 * 1000,
       // });
 
-      res.json({
+      res.status(200).json({
         _id: user._id,
         sponser: user.sponser,
         name: user.name,
@@ -211,6 +213,7 @@ router.post(
         sts: "01",
         msg: "Login Success",
       });
+
     } else {
       res.status(401).json({ sts: "00", msg: "Login failed" });
       // throw new Error("Invalid email or password");

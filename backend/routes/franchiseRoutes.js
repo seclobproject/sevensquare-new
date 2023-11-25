@@ -59,10 +59,10 @@ router.post(
     const { name, phone, email, profession, district } = req.body;
 
     const user = await User.findById(userId).populate("packageChosen");
-    console.log(user);
 
     if (user) {
       const newWorker = await Worker.create({
+        addedBy: user._id,
         name,
         email,
         phone,
@@ -71,7 +71,6 @@ router.post(
       });
 
       if (newWorker) {
-
         user.pinsLeft = user.pinsLeft - 1;
         await user.save();
 
@@ -167,6 +166,36 @@ router.post(
       res.status(400);
       throw new Error("Registration failed. Please try again!");
     }
+  })
+);
+
+// Get the activated PINS (added workers)
+// GET: Get the activated pin members to user
+// Access to user
+router.get(
+  "/get-activated-pins",
+  protect,
+  asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+
+    const activatedPins = await Worker.find({ addedBy: userId });
+
+    console.log(activatedPins);
+    if (activatedPins) {
+      res.status(200).json({
+        activatedPins,
+        userStatus: user.userStatus,
+      });
+    } else {
+      res.status(404).json({
+        sts: "00",
+        msg: "Couldn't fetch any activated pins!",
+      });
+    }
+
+
   })
 );
 
