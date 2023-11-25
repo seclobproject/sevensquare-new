@@ -76,6 +76,7 @@ router.post(
         await user.save();
 
         res.status(201).json({
+          userStatus: user.userStatus,
           name,
           email,
           phone,
@@ -147,6 +148,7 @@ router.post(
         await sponserUser.save();
 
         res.status(200).json({
+          userStatus: sponserUser.userStatus,
           _id: user._id,
           sponser: user.sponser,
           name: user.name,
