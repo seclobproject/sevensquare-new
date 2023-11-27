@@ -49,6 +49,12 @@ const giveSalary = async (user) => {
   }
 };
 
+const generateRandomString = () => {
+  const baseString = "SSG";
+  const randomDigits = Math.floor(Math.random() * 999999);
+  return baseString + randomDigits.toString();
+};
+
 router.post(
   "/",
   protect,
@@ -59,10 +65,9 @@ router.post(
 
     const sponserUser = await User.findById(sponser);
 
-    const ownSponserId = Randomstring.generate(7);
+    const ownSponserId = generateRandomString();
 
-    const { name, email, phone, address, packageChosen, password } =
-      req.body;
+    const { name, email, phone, address, packageChosen, password } = req.body;
 
     const existingUser = await User.findOne({ email });
     const existingUserByPhone = await User.findOne({ phone });
@@ -87,8 +92,9 @@ router.post(
     if (packageChosen) {
       const packageSelected = await Package.findById(packageChosen);
 
-      if(packageSelected){
-        const pinsLeft = packageSelected.usersCount + packageSelected.addOnUsers;
+      if (packageSelected) {
+        const pinsLeft =
+          packageSelected.usersCount + packageSelected.addOnUsers;
       }
     }
 
@@ -100,11 +106,9 @@ router.post(
       address,
       packageChosen,
       password,
-      isAdmin,
       ownSponserId,
       screenshot,
       referenceNo,
-      pinsLeft,
       earning,
       unrealisedEarning,
       userStatus,
@@ -172,14 +176,12 @@ router.post(
 router.post(
   "/login",
   asyncHandler(async (req, res) => {
-    
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
-
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ userId: user._id }, "secret_of_jwt_for_sevensquare_5959", {
         expiresIn: "1d",
       });
 
@@ -213,7 +215,6 @@ router.post(
         sts: "01",
         msg: "Login Success",
       });
-
     } else {
       res.status(401).json({ sts: "00", msg: "Login failed" });
       // throw new Error("Invalid email or password");
@@ -287,27 +288,78 @@ router.post(
 
 // Verify user by admin after the payment screenshot received
 // POST: Only for admin/sponser
+const splitCommissions = async (user, amount, levels, percentages) => {
+  if (!user || levels === 0) {
+    return;
+  }
+
+  const commission = (percentages[0] / 100) * amount;
+  const sponser = await User.findById(user.sponser);
+
+  if (sponser) {
+    if (sponser.children.length >= 4) {
+      sponser.earning = sponser.earning + commission;
+    } else if (sponser.children.length === 2 && percentages[0] === 8) {
+      sponser.earning = sponser.earning + commission;
+    } else if (sponser.children.length === 3 && percentages[0] === 5) {
+      sponser.earning = sponser.earning + commission;
+    } else {
+      sponser.unrealisedEarning.push(commission);
+    }
+
+    await sponser.save();
+    splitCommissions(sponser, amount, levels - 1, percentages.slice(1));
+  }
+};
+
+
 router.post(
   "/verify-user-payment",
   superAdmin,
   asyncHandler(async (req, res) => {
-    const sponserUserId = req.user._id;
+    // const sponserUserId = req.user._id;
 
     const { userId } = req.body;
+    const user = await User.findById(userId);
 
-    const sponseredUsers = await User.findById(sponserUserId).populate({
-      path: "children",
-    });
+    // const sponseredUsers = await User.findById(user).populate({
+    //   path: "children",
+    // });
 
-    const theUser = sponseredUsers.children.find((child) =>
-      child._id.equals(userId)
-    );
+    // const theUser = sponseredUsers.children.find((child) =>
+    //   child._id.equals(userId)
+    // );
 
-    if (theUser) {
-      theUser.userStatus = "approved";
 
-      const updatedUser = await theUser.save();
-      res.status(200).json({ updatedUser });
+    if (user) {
+      user.userStatus = "approved";
+
+      const updatedUser = await user.save();
+
+      if (updatedUser) {
+
+        const sponserUser = await User.findById(user.sponser);
+
+        const packageSelected = await user.populate({
+          path: "packageChosen",
+        });
+
+        //NEW
+        const percentages = [8, 5, 4, 3, 2, 1];
+        //NEW
+        const levels = Math.min(percentages.length, 7);
+        const packageAmount = packageSelected.packageChosen.amountExGST;
+        //NEW
+        const sponserCommission = (25 / 100) * packageAmount;
+        sponserUser.earning = sponserUser.earning + sponserCommission;
+        await sponserUser.save();
+
+        splitCommissions(sponserUser, packageAmount, levels, percentages);
+      }
+
+      res
+        .status(200)
+        .json({ updatedUser, message: "Commissions splitted successfully!" });
     } else {
       res.status(401);
       throw new Error("Can't find this user. Please check again!");

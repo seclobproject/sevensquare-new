@@ -24,6 +24,7 @@ import User from "../models/userModel.js";
 // });
 
 const protect = asyncHandler(async (req, res, next) => {
+
   let token;
 
   if (
@@ -32,9 +33,10 @@ const protect = asyncHandler(async (req, res, next) => {
     try {
       token = req.headers.authorization.split(" ")[1];
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, "secret_of_jwt_for_sevensquare_5959");
 
       req.user = await User.findById(decoded.userId).select("-password");
+      console.log(req.user);
 
       next();
     } catch (error) {
@@ -87,7 +89,7 @@ const superAdmin = asyncHandler(async (req, res, next) => {
     try {
       token = req.headers.authorization.split(" ")[1];
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, "secret_of_jwt_for_sevensquare_5959");
 
       req.user = await User.findById(decoded.userId).select("-password");
 
@@ -121,7 +123,7 @@ const protectVerifyStatus = asyncHandler(async (req, res, next) => {
     try {
       token = req.headers.authorization.split(" ")[1];
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, "secret_of_jwt_for_sevensquare_5959");
 
       req.user = await User.findById(decoded.userId).select("-password");
 

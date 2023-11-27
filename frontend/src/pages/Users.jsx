@@ -1,30 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
 import DashboardCard07 from "../partials/dashboard/DashboardCard07";
 import Banner from "../partials/Banner";
-import { useDispatch } from "react-redux";
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const dispatch = useDispatch();
-
-  const { loading, data, error } = useSelector((state) => state.packageReducer);
-
-  const headings = {
-    packageName: "Package Name",
-    amount: "Amount",
-    amountExGST: "Amount ExGST",
-    usersCount: "Users Count",
-    addOnUsers: "Addon Users",
-    delete: "Delete",
-  };
-
-  useEffect(() => {
-    dispatch(fetchPackage());
-  }, [dispatch]);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -56,10 +38,11 @@ function Dashboard() {
 
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
-              <DashboardCard07 data={data} headings={headings} />
+              <DashboardCard07 />
             </div>
           </div>
         </main>
+        
       </div>
     </div>
   );

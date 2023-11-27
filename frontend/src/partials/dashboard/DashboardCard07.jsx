@@ -5,14 +5,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchPackage } from "../../Slice/packageSlice";
 // Redux imports end
 
-function DashboardCard07() {
-  const dispatch = useDispatch();
+function DashboardCard07({data, headings}) {
+  // const dispatch = useDispatch();
 
-  const { loading, data, error } = useSelector((state) => state.packageReducer);
+  // const { loading, data, error } = useSelector((state) => state.packageReducer);
 
-  useEffect(() => {
-    dispatch(fetchPackage());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchPackage());
+  // }, [dispatch]);
+
+  console.log(headings);
 
   return (
     <div className="col-span-full xl:col-span-12 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">

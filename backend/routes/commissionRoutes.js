@@ -40,6 +40,7 @@ router.post(
   "/split-commission",
   protect,
   asyncHandler(async (req, res) => {
+
     const sponserUserId = req.user._id;
 
     const { userId } = req.body;
@@ -60,7 +61,7 @@ router.post(
     });
 
     //NEW
-    const percentages = [8, 7, 5, 4, 3, 2, 1];
+    const percentages = [8, 5, 4, 3, 2, 1];
     //NEW
     const levels = Math.min(percentages.length, 7);
     const packageAmount = packageSelected.packageChosen.amountExGST;

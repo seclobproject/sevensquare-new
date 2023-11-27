@@ -13,14 +13,15 @@ const importData = async () => {
   try {
 
     await User.deleteMany();
-    const createdUsers = await User.insertMany(users);
+    // const createdUsers = await User.insertMany(users);
 
-    console.log("Data imported");
+    console.log("Data cleared");
     process.exit();
   } catch (error) {
     console.error(`${error}`);
     process.exit(1);
   }
+  
 };
 
 const destroyData = async () => {
