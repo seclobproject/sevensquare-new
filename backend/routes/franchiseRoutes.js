@@ -8,6 +8,7 @@ import Worker from "../models/workerModel.js";
 import Package from "../models/packageModel.js";
 
 import Randomstring from "randomstring";
+import { populate } from "dotenv";
 // There will be N number of user pins available to someone who bought franchise
 
 // List N number of pins
@@ -20,6 +21,7 @@ router.get(
     const userId = req.user._id;
 
     const user = await User.findById(userId).populate("packageChosen");
+    const packageType = user.packageChosen.schemeType;
 
     if (user) {
       const pinCount =
@@ -28,7 +30,8 @@ router.get(
       if (pinCount > 0) {
         res.status(201).json({
           userStatus: user.userStatus,
-          pinCount,
+          pinsLeft: user.pinsLeft,
+          packageType,
           sts: "01",
           msg: "Pins fetched successfully!",
         });
@@ -61,39 +64,39 @@ router.post(
     const user = await User.findById(userId).populate("packageChosen");
 
     if (user) {
-      const newWorker = await Worker.create({
-        addedBy: user._id,
-        name,
-        email,
-        phone,
-        profession,
-        district,
-      });
-
-      if (newWorker) {
-        user.pinsLeft = user.pinsLeft - 1;
-        await user.save();
-
-        res.status(201).json({
-          userStatus: user.userStatus,
+      if (user.pinsLeft > 0) {
+        const newWorker = await Worker.create({
+          addedBy: user._id,
           name,
           email,
           phone,
           profession,
           district,
-          sts: "01",
-          msg: "Pin added successfully!",
         });
+
+        if (newWorker) {
+          user.pinsLeft = user.pinsLeft - 1;
+          await user.save();
+          res.status(201).json({
+            sts: "01",
+            msg: "Member added successfully!",
+          });
+        } else {
+          res.status(400).json({
+            sts: "00",
+            msg: "Some error occured. Please try again!",
+          });
+        }
       } else {
         res.status(400).json({
           sts: "00",
-          msg: "Failed adding. Please try again!",
+          msg: "Failed adding. No PINs left!",
         });
       }
     } else {
       res.status(400).json({
         sts: "00",
-        msg: "Some error occured. Please check if you are signed in!",
+        msg: "No user found. Check if you are logged in!",
       });
     }
   })
@@ -102,6 +105,12 @@ router.post(
 // Use the PIN to Register new member
 // POST: The worker details will be send to Seclob
 // Access to user
+const generateRandomString = () => {
+  const baseString = "SSG";
+  const randomDigits = Math.floor(Math.random() * 999999);
+  return baseString + randomDigits.toString();
+};
+
 router.post(
   "/register",
   protect,
@@ -110,61 +119,77 @@ router.post(
 
     const userStatus = "approved";
 
-    const sponserUser = await User.findById(sponser);
+    const sponserUser = await User.findById(sponser).populate("packageChosen");
 
-    const ownSponserId = Randomstring.generate(7);
+    const packageType = sponserUser.packageChosen.schemeType;
 
-    const { name, email, phone, address, password } = req.body;
+    if (packageType === "franchise") {
+      if (sponserUser && sponserUser.pinsLeft > 0) {
+        const ownSponserId = generateRandomString();
 
-    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+        const { name, email, phone, address, password } = req.body;
 
-    if (existingUser) {
-      res.status(400).json({ sts: "00", msg: "User has already registered!" });
-    }
-
-    const unrealisedEarning = [];
-    const children = [];
-    const packageChosen = await Package.findOne({ amount: 1000 });
-
-    const user = await User.create({
-      sponser,
-      name,
-      email,
-      phone,
-      address,
-      password,
-      packageChosen,
-      unrealisedEarning,
-      ownSponserId,
-      userStatus,
-      children,
-    });
-
-    if (user) {
-      if (sponserUser) {
-        sponserUser.children.push(user._id);
-        sponserUser.pinsLeft = sponserUser.pinsLeft - 1;
-        await sponserUser.save();
-
-        res.status(200).json({
-          userStatus: sponserUser.userStatus,
-          _id: user._id,
-          sponser: user.sponser,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          address: user.address,
-          packageChosen: user.packageChosen,
-          ownSponserId: user.ownSponserId,
-          pinsLeft: user.pinsLeft,
+        const existingUser = await User.findOne({
+          $or: [{ email }, { phone }],
         });
+
+        if (existingUser) {
+          res
+            .status(400)
+            .json({ sts: "00", msg: "User has already registered!" });
+        }
+
+        const unrealisedEarning = [];
+        const children = [];
+        const packageChosen = await Package.findOne({ amount: 1000 });
+
+        const user = await User.create({
+          sponser,
+          name,
+          email,
+          phone,
+          address,
+          password,
+          packageChosen,
+          unrealisedEarning,
+          ownSponserId,
+          userStatus,
+          children,
+        });
+        if (user) {
+          sponserUser.children.push(user._id);
+          sponserUser.pinsLeft = sponserUser.pinsLeft - 1;
+          await sponserUser.save();
+
+          res.status(200).json({
+            userStatus: sponserUser.userStatus,
+            _id: user._id,
+            sponser: user.sponser,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            address: user.address,
+            packageChosen: user.packageChosen,
+            ownSponserId: user.ownSponserId,
+            pinsLeft: sponserUser.pinsLeft,
+          });
+        } else {
+          res.status(401).json({
+            sts: "00",
+            msg: "Registration failed. Please try again!",
+          });
+        }
       } else {
-        res.status(400);
-        throw new Error("Some error occured. Make sure you are logged in!");
+        res.status(401).json({
+          sts: "00",
+          msg: "You have no PINs left!",
+        });
       }
     } else {
-      res.status(400);
-      throw new Error("Registration failed. Please try again!");
+      res.status(401).json({
+        sts: "00",
+        msg: "You are not a franchise package holder!",
+      });
     }
   })
 );
@@ -194,8 +219,6 @@ router.get(
         msg: "Couldn't fetch any activated pins!",
       });
     }
-
-
   })
 );
 

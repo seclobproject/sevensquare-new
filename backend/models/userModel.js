@@ -12,6 +12,19 @@ const transactionSchema = new mongoose.Schema(
   }
 );
 
+const bankSchema = new mongoose.Schema(
+  {
+    holderName: String,
+    accountNum: String,
+    ifscCode: String,
+    bank: String,
+    aadhar: String,
+    pan: String,
+    aadharPhoto: String,
+    panPhoto: String
+  }
+)
+
 const userSchema = new mongoose.Schema(
   {
     sponser: {
@@ -84,6 +97,7 @@ const userSchema = new mongoose.Schema(
       default: 1
     },
     transactions: [transactionSchema],
+    bankDetails: [bankSchema],
     userStatus: {
       type: String,
       enum: ["pending", "approved", "rejected"],

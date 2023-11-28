@@ -13,6 +13,7 @@ import salaryRoutes from "./routes/salaryRoutes.js";
 // import pinRoutes from "./routes/pinRoutes.js";
 import walletRoutes from "./routes/walletRoutes.js";
 import franchiseRoutes from "./routes/franchiseRoutes.js";
+import bankRoutes from "./routes/bankRoutes.js";
 
 //dotenv
 import dotenv from "dotenv";
@@ -46,6 +47,7 @@ app.use("/api/salary", salaryRoutes);
 // app.use("/api/pins", pinRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/franchise", franchiseRoutes);
+app.use("/api/bank", bankRoutes);
 // API Points
 
 app.use(errorHandler);

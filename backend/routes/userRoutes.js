@@ -92,9 +92,9 @@ router.post(
     if (packageChosen) {
       const packageSelected = await Package.findById(packageChosen);
 
+      let pinsLeft;
       if (packageSelected) {
-        const pinsLeft =
-          packageSelected.usersCount + packageSelected.addOnUsers;
+        pinsLeft = packageSelected.usersCount + packageSelected.addOnUsers;
       }
     }
 
@@ -113,6 +113,7 @@ router.post(
       unrealisedEarning,
       userStatus,
       children,
+      pinsLeft,
     });
 
     if (user) {
@@ -181,9 +182,13 @@ router.post(
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
-      const token = jwt.sign({ userId: user._id }, "secret_of_jwt_for_sevensquare_5959", {
-        expiresIn: "1d",
-      });
+      const token = jwt.sign(
+        { userId: user._id },
+        "secret_of_jwt_for_sevensquare_5959",
+        {
+          expiresIn: "1d",
+        }
+      );
 
       // res.cookie("jwt", token, {
       //   httpOnly: true,
@@ -242,9 +247,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
-// Initialize Multer upload middleware
-// const upload = multer({ storage: storage });
 
 // POST: User verification
 // After first/fresh user login
@@ -312,7 +314,6 @@ const splitCommissions = async (user, amount, levels, percentages) => {
   }
 };
 
-
 router.post(
   "/verify-user-payment",
   superAdmin,
@@ -330,14 +331,12 @@ router.post(
     //   child._id.equals(userId)
     // );
 
-
     if (user) {
       user.userStatus = "approved";
 
       const updatedUser = await user.save();
 
       if (updatedUser) {
-
         const sponserUser = await User.findById(user.sponser);
 
         const packageSelected = await user.populate({
@@ -392,6 +391,10 @@ router.get(
     }
 
     const childrenArray = users.children || [];
+
+    // childrenArray.forEach((child) => {
+    //   const packageChosen =
+    // })
 
     if (childrenArray.length === 0) {
       res
@@ -529,17 +532,34 @@ router.post(
   })
 );
 
-// Logout user
-// router.post(
-//   "/logout",
-//   asyncHandler(async (req, res) => {
-//     res.cookie("jwt", "", {
-//       httpOnly: true,
-//       expires: new Date(0),
-//     });
+// PUT: Change password
+// Access to admin/user
+router.put(
+  "/change-password",
+  protect,
+  asyncHandler(async (req, res) => {
+    const userId = req.user._id;
 
-//     res.status(200).json({ message: "Logged out successfully" });
-//   })
-// );
+    const user = await User.findById(userId);
+
+    const { password } = req.body;
+    if (user) {
+      user.password = password;
+      const updatedUser = user.save();
+
+      if (updatedUser) {
+        console.log(updatedUser);
+        res
+          .status(200)
+          .json({ sts: "01", msg: "Password changed successfully!" });
+        }else{
+        res
+          .status(401)
+          .json({ sts: "00", msg: "Password changing failed!" });
+
+      }
+    }
+  })
+);
 
 export default router;
