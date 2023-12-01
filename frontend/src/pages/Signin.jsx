@@ -15,7 +15,7 @@ const Signin = () => {
 
   useEffect(() => {
     if (userInfo) {
-      navigate(`/dashboard`);
+      navigate(`/packages`);
     }
   }, [userInfo, navigate]);
 

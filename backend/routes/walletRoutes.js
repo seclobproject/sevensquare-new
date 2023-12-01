@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
-import { protectVerifyStatus } from "../middleware/authMiddleware.js";
+import { protect, protectVerifyStatus } from "../middleware/authMiddleware.js";
 
 // Generate random string fro temperory reference ID
 const generateRandomString = (length) => {
@@ -22,7 +22,7 @@ const generateRandomString = (length) => {
 // Access to admin/user
 router.get(
   "/",
-  protectVerifyStatus,
+  protect,
   asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
@@ -31,6 +31,7 @@ router.get(
     if (user) {
       res.status(200).json({
         earning: user.earning,
+        userStatus: user.userStatus,
         unrealisedEarning: user.unrealisedEarning,
         transactionHistory: user.transactions,
         sts: "01",
@@ -41,6 +42,7 @@ router.get(
     }
   })
 );
+
 
 // POST: Withdraw from wallet
 // Access to user

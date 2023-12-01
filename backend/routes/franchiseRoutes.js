@@ -21,17 +21,20 @@ router.get(
     const userId = req.user._id;
 
     const user = await User.findById(userId).populate("packageChosen");
-    const packageType = user.packageChosen.schemeType;
+
+    let packageType;
+
+    if (user.packageChosen) {
+      packageType = user.packageChosen.schemeType;
+    }
 
     if (user) {
-      const pinCount =
-        user.packageChosen.usersCount + user.packageChosen.addOnUsers;
 
-      if (pinCount > 0) {
+      if (user.pinsLeft > 0) {
         res.status(201).json({
           userStatus: user.userStatus,
           pinsLeft: user.pinsLeft,
-          packageType,
+          packageType: user.packageChosen && user.packageType,
           sts: "01",
           msg: "Pins fetched successfully!",
         });
@@ -127,7 +130,8 @@ router.post(
       if (sponserUser && sponserUser.pinsLeft > 0) {
         const ownSponserId = generateRandomString();
 
-        const { name, email, phone, address, password } = req.body;
+        const { name, email, phone, address, password, packageSelected } =
+          req.body;
 
         const existingUser = await User.findOne({
           $or: [{ email }, { phone }],
@@ -141,7 +145,8 @@ router.post(
 
         const unrealisedEarning = [];
         const children = [];
-        const packageChosen = await Package.findOne({ amount: 1000 });
+        const packageTaken = await Package.findById(packageSelected);
+        const pinsLeft = packageTaken.usersCount + packageTaken.addOnUsers;
 
         const user = await User.create({
           sponser,
@@ -150,7 +155,8 @@ router.post(
           phone,
           address,
           password,
-          packageChosen,
+          packageChosen: packageSelected,
+          pinsLeft,
           unrealisedEarning,
           ownSponserId,
           userStatus,

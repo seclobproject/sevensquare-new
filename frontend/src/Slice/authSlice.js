@@ -17,6 +17,10 @@ export const fetchUser = createAsyncThunk("fetchUser", async (data) => {
   return response.data;
 });
 
+export const logout = createAsyncThunk("logout", async () => {
+  localStorage.removeItem('userInfo');
+});
+
 const initialState = {
   userInfo: localStorage.getItem("userInfo")
     ? JSON.parse(localStorage.getItem("userInfo"))
@@ -41,6 +45,9 @@ const authSlice = createSlice({
     builder.addCase(fetchUser.rejected, (state, action) => {
       console.log("Error", action.payload);
       state.error = true;
+    });
+    builder.addCase(logout.fulfilled, (state, action) => {
+      state.userInfo = null
     });
   },
 });

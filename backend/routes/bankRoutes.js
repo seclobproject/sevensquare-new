@@ -5,51 +5,41 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
 import { protect } from "../middleware/authMiddleware.js";
 
-import multer from "multer";
+import uploadMiddleware from "../middleware/uploadMiddleware.js";
 
 // POST: Add bank details
 // Access to admin/user
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "-" + uniqueSuffix);
-  },
-});
-
-const upload = multer({ storage: storage });
-
 router.post(
   "/",
   protect,
-  upload.fields([{ name: 'image1', maxCount: 1 }, { name: 'image2', maxCount: 1 }]),
+  uploadMiddleware,
   asyncHandler(async (req, res) => {
-    if (req.files < 2) {
-      res.status(400).json({ message: "Please upload files" });
-    }
+    const file1 = req.files["file1"][0];
+    const file2 = req.files["file2"][0];
 
     const userId = req.user._id;
     const user = await User.findById(userId);
     const { holderName, accountNum, ifscCode, bank, aadhar, pan } = req.body;
 
     if (user) {
-      user.bankDetails.aadharPhoto = req.files.image1[0].filename;
-      user.bankDetails.panPhoto = req.files.image2[0].filename;
-      user.bankDetails.holderName = holderName;
-      user.bankDetails.accountNum = accountNum;
-      user.bankDetails.ifscCode = ifscCode;
-      user.bankDetails.bank = bank;
-      user.bankDetails.aadhar = aadhar;
-      user.bankDetails.pan = pan;
+      
+      user.bankDetails = {
+        aadharPhoto: file1.filename,
+        panPhoto: file2.filename,
+        holderName: holderName,
+        accountNum: accountNum,
+        ifscCode: ifscCode,
+        bank: bank,
+        aadhar: aadhar,
+        pan: pan,
+      };
 
       const updatedUser = await user.save();
 
       if (updatedUser) {
         res.status(201).json({
-          updatedUser,
+          bankDetails: updatedUser.bankDetails,
           sts: "01",
           msg: "Bank details added successfully!",
         });
@@ -61,6 +51,32 @@ router.post(
       }
     } else {
       res.status(401).json({ sts: "00", msg: "User not found!" });
+    }
+  })
+);
+
+// GET Bank details
+// ACCESS to user
+router.get(
+  "/get-details",
+  protect,
+  asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+
+    if (user) {
+      if (user.bankDetails) {
+        res.status(200).json({
+          bankDetails: user.bankDetails,
+          sts: "01",
+          msg: "Fetched successfully",
+        });
+      } else {
+        res.status(404).json({ sts: "00", msg: "Bank details not found!" });
+      }
+    } else {
+      res.status(404).json({ sts: "00", msg: "User not found" });
     }
   })
 );

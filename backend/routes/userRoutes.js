@@ -12,6 +12,8 @@ import {
 } from "../middleware/authMiddleware.js";
 import multer from "multer";
 import Package from "../models/packageModel.js";
+import sendMail from "../config/mailer.js";
+import s3Upload from "../config/s3Service.js";
 // import upload from "../middleware/fileUploadMiddleware.js";
 
 // Register new user
@@ -89,10 +91,10 @@ router.post(
     const unrealisedEarning = [];
     const children = [];
 
+    let pinsLeft = 1;
     if (packageChosen) {
       const packageSelected = await Package.findById(packageChosen);
 
-      let pinsLeft;
       if (packageSelected) {
         pinsLeft = packageSelected.usersCount + packageSelected.addOnUsers;
       }
@@ -141,7 +143,11 @@ router.post(
           sponserUser.unrealisedEarning = remainingNumbers;
         }
 
-        await sponserUser.save();
+        const updatedUser = await sponserUser.save();
+
+        if (updatedUser) {
+          await sendMail(user.email, user.name, user.ownSponserId);
+        }
 
         res.json({
           _id: user._id,
@@ -186,7 +192,7 @@ router.post(
         { userId: user._id },
         "secret_of_jwt_for_sevensquare_5959",
         {
-          expiresIn: "1d",
+          expiresIn: "365d",
         }
       );
 
@@ -222,19 +228,10 @@ router.post(
       });
     } else {
       res.status(401).json({ sts: "00", msg: "Login failed" });
-      // throw new Error("Invalid email or password");
     }
   })
 );
 
-// Set up Multer storage
-// const storage = multer.diskStorage({
-//   destination: "./uploads",
-//   filename: (req, file, cb) => {
-//     const uniqueFilename = Date.now() + "-" + path.extname(file.originalname);
-//     cb(null, uniqueFilename);
-//   },
-// });
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -246,6 +243,8 @@ const storage = multer.diskStorage({
   },
 });
 
+// const storage = multer.memoryStorage();
+
 const upload = multer({ storage: storage });
 
 // POST: User verification
@@ -253,8 +252,9 @@ const upload = multer({ storage: storage });
 router.post(
   "/verify-user",
   protect,
-  upload.single("image"),
+  upload.single('image'),
   asyncHandler(async (req, res) => {
+    
     if (!req.file) {
       res.status(400).json({ message: "No file uploaded" });
     }
@@ -377,10 +377,36 @@ router.get(
 );
 
 // GET: All users to admin (under that specific admin with his referralID)
+
+const addPackages = async (childrenArray) => {
+  
+  let result = [];
+
+  for (const child of childrenArray) {
+    const user = await User.findById(child._id).populate("packageChosen");
+
+    const packageChosen = user.packageChosen;
+
+    if (user) {
+      result.push({
+        name: child.name,
+        sponserId: child.ownSponserId,
+        phone: child.phone,
+        email: child.email,
+        address: child.address,
+        packageName: packageChosen && packageChosen.name,
+        packageAmount: packageChosen && packageChosen.amount,
+        packageType: packageChosen && packageChosen.schemeType,
+      });
+    }
+  }
+  
+  return result;
+};
+
 router.get(
   "/get-my-users",
   protect,
-  protectVerifyStatus,
   asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
@@ -392,16 +418,14 @@ router.get(
 
     const childrenArray = users.children || [];
 
-    // childrenArray.forEach((child) => {
-    //   const packageChosen =
-    // })
+    const result = await addPackages(childrenArray);
 
     if (childrenArray.length === 0) {
       res
         .status(401)
-        .res({ sts: "00", message: "No members found under you!" });
+        .res({ sts: "00", message: "No members found under you!", userStatus: users.userStatus });
     } else {
-      res.status(200).json({ children: childrenArray });
+      res.status(200).json({ result, userStatus: users.userStatus });
     }
   })
 );
@@ -427,6 +451,8 @@ router.get(
           const modifiedObject = {
             ...child,
             packageSelected: packageSelected.name,
+            packageAmount: packageSelected.amount,
+            schemeType: packageSelected.schemeType,
           };
 
           // Remove Mongoose metadata
@@ -448,6 +474,8 @@ router.get(
       members = updatedArray.map((obj) => ({
         ...obj._doc,
         packageSelected: obj.packageSelected,
+        packageAmount: obj.packageAmount,
+        schemeType: obj.schemeType,
       }));
     }
 
@@ -466,7 +494,7 @@ router.get(
 // Access to admin
 router.put(
   "/edit-profile",
-  protectVerifyStatus,
+  protect,
   asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
@@ -476,10 +504,10 @@ router.put(
 
     if (user) {
       user.name = name;
-      user.email = email;
-      user.phone = phone;
-      user.address = address;
-      user.password = password;
+      user.email = email || user.email;
+      user.phone = phone || user.phone;
+      user.address = address || user.address;
+      user.password = password || user.password;
     }
     const updatedUser = await user.save();
 
@@ -522,7 +550,7 @@ router.post(
         earning: user.earning,
         unrealisedEarning: user.unrealisedEarning,
         userStatus: user.userStatus,
-        packageChosen: user.packageChosen.amount,
+        packageChosen: user.packageChosen && user.packageChosen.amount,
         sts: "01",
         msg: "Profile fetched successfully",
       });
@@ -552,11 +580,8 @@ router.put(
         res
           .status(200)
           .json({ sts: "01", msg: "Password changed successfully!" });
-        }else{
-        res
-          .status(401)
-          .json({ sts: "00", msg: "Password changing failed!" });
-
+      } else {
+        res.status(401).json({ sts: "00", msg: "Password changing failed!" });
       }
     }
   })

@@ -86,6 +86,7 @@ const superAdmin = asyncHandler(async (req, res, next) => {
     req.headers.authorization && req.headers.authorization.startsWith("Bearer")
   ) {
     try {
+      console.log(req.headers.authorization);
       token = req.headers.authorization.split(" ")[1];
 
       const decoded = jwt.verify(token, "secret_of_jwt_for_sevensquare_5959");

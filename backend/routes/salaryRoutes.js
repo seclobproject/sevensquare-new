@@ -62,7 +62,26 @@ router.post(
     const updatedUser = await user.save();
 
     res.status(200).json({ updatedUser });
+  })
+);
 
+router.get(
+  "/get-salary",
+  protect,
+  asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+
+    if (user) {
+      res.status(200).json({
+        userStatus: user.userStatus,
+        unrealisedSalary: user.unrealisedSalary,
+        earning: user.earning,
+      });
+    } else {
+      res.status(401).json({ sts: "00", msg: "User not found!" });
+    }
   })
 );
 

@@ -2,19 +2,21 @@ import React, { useEffect } from "react";
 
 // Redux imports start
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPackage } from "../../Slice/packageSlice";
+import { deletePackage, fetchPackage } from "../../Slice/packageSlice";
 // Redux imports end
 
-function DashboardCard07({data, headings}) {
-  // const dispatch = useDispatch();
+function DashboardCard07() {
+  const dispatch = useDispatch();
 
-  // const { loading, data, error } = useSelector((state) => state.packageReducer);
+  const { data } = useSelector((state) => state.packageReducer);
 
-  // useEffect(() => {
-  //   dispatch(fetchPackage());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchPackage());
+  }, [dispatch]);
 
-  console.log(headings);
+  const HandleDelete = (id) => {
+    dispatch(deletePackage(id));
+  };
 
   return (
     <div className="col-span-full xl:col-span-12 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
@@ -46,7 +48,7 @@ function DashboardCard07({data, headings}) {
                   <div className="font-semibold text-center">Addon users</div>
                 </th>
                 <th className="p-2">
-                  <div className="font-semibold text-center">Delete</div>
+                  <div className="font-semibold text-center">Scheme type</div>
                 </th>
               </tr>
             </thead>
@@ -78,11 +80,7 @@ function DashboardCard07({data, headings}) {
                         <div className="text-center">{eachPack.addOnUsers}</div>
                       </td>
                       <td className="p-2">
-                        <div className="text-center">
-                          <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white">
-                            Delete
-                          </button>
-                        </div>
+                        <div className="text-center">{eachPack.schemeType}</div>
                       </td>
                     </tr>
                   );

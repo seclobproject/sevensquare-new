@@ -5,25 +5,12 @@ const transactionSchema = new mongoose.Schema(
   {
     referenceID: String,
     amount: Number,
-    status: String
+    status: String,
   },
   {
     timestamps: true,
   }
 );
-
-const bankSchema = new mongoose.Schema(
-  {
-    holderName: String,
-    accountNum: String,
-    ifscCode: String,
-    bank: String,
-    aadhar: String,
-    pan: String,
-    aadharPhoto: String,
-    panPhoto: String
-  }
-)
 
 const userSchema = new mongoose.Schema(
   {
@@ -72,11 +59,11 @@ const userSchema = new mongoose.Schema(
     },
     screenshot: {
       type: String,
-      default: null
+      default: null,
     },
     referenceNo: {
       type: String,
-      default: null
+      default: null,
     },
     earning: {
       type: Number,
@@ -94,10 +81,19 @@ const userSchema = new mongoose.Schema(
     pinsLeft: {
       type: Number,
       required: true,
-      default: 1
+      default: 1,
     },
     transactions: [transactionSchema],
-    bankDetails: [bankSchema],
+    bankDetails: {
+      holderName: String,
+      accountNum: String,
+      ifscCode: String,
+      bank: String,
+      aadhar: String,
+      pan: String,
+      aadharPhoto: String,
+      panPhoto: String,
+    },
     userStatus: {
       type: String,
       enum: ["pending", "approved", "rejected"],
