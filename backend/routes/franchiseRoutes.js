@@ -22,28 +22,18 @@ router.get(
 
     const user = await User.findById(userId).populate("packageChosen");
 
-    let packageType;
-
-    if (user.packageChosen) {
-      packageType = user.packageChosen.schemeType;
-    }
+    let packageType = user.packageChosen.schemeType;
 
     if (user) {
 
-      if (user.pinsLeft > 0) {
         res.status(201).json({
           userStatus: user.userStatus,
           pinsLeft: user.pinsLeft,
-          packageType: user.packageChosen && user.packageType,
+          packageType,
           sts: "01",
           msg: "Pins fetched successfully!",
         });
-      } else {
-        res.status(401).json({
-          sts: "00",
-          msg: "You have no pins left!",
-        });
-      }
+        
     } else {
       res.status(404).json({
         sts: "00",
@@ -106,7 +96,7 @@ router.post(
 );
 
 // Use the PIN to Register new member
-// POST: The worker details will be send to Seclob
+// POST: The member will as the normal members
 // Access to user
 const generateRandomString = () => {
   const baseString = "SSG";

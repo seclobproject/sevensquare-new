@@ -15,6 +15,8 @@ import UserDetails from "./pages/UserDetails";
 import PackageForm from "./components/PackageForm";
 import VerifyUsersPage from "./pages/VerifyUsersPage";
 import VerifiedUserPage from "./pages/VerifiedUsersPage";
+import Referral from "./pages/Referral";
+import Transactions from "./pages/Transactions";
 
 function App() {
   const location = useLocation();
@@ -28,6 +30,7 @@ function App() {
   return (
     <>
       <Routes>
+        <Route exact path="/dash" element={<Dashboard />} />
         <Route exact path="/" element={<Signin />} />
         <Route path="/packages" element={<Packages />} />
         <Route path="/dashboard" element={<Packages />} />
@@ -36,6 +39,8 @@ function App() {
         <Route path="/user-details/:userId" element={<UserDetails />} />
         <Route path="/verify-users" element={<VerifyUsersPage />} />
         <Route path="/verified-users" element={<VerifiedUserPage />} />
+        <Route path="/referral/:sponser" element={<Referral />} />
+        <Route path="/transactions" element={<Transactions />} />
       </Routes>
     </>
   );

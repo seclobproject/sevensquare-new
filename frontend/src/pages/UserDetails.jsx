@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userDetails } from "../Slice/usersSlice";
 import { useParams } from "react-router-dom";
+import ModalImage from "react-modal-image";
 
 const UserDetails = () => {
   const dispatch = useDispatch();
@@ -9,10 +10,10 @@ const UserDetails = () => {
 
   const { data } = useSelector((state) => state.getUserDetailReducer);
   let bankDetails = {};
-  if(data && data.bankDetails){
+  if (data && data.bankDetails) {
     bankDetails = {
       holderName: data.bankDetails.holderName,
-    }
+    };
   }
 
   useEffect(() => {
@@ -52,6 +53,14 @@ const UserDetails = () => {
                 <td className="p-2">
                   <div className="font-semibold">Users Count</div>
                 </td>
+                <td className="p-2">
+                  <div className="font-semibold">UnrealisedEarning </div>
+                  {data && data.unrealisedEarning}
+                </td>
+                <td className="p-2">
+                  <div className="font-semibold">UserStatus</div>
+                  {data && data.userStatus}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -69,7 +78,21 @@ const UserDetails = () => {
                 </td>
                 <td className="p-2">
                   <div className="font-semibold">ScreenShot</div>
-                  {data && data.screenshot}
+                  {data && (
+                    <div
+                      style={{
+                        width: "300px",
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <ModalImage
+                        small={`https://sevensquaregroup.in/uploads/${data.screenshot}`}
+                        large={`https://sevensquaregroup.in/uploads/${data.screenshot}`}
+                        alt="screenshot"
+                      />
+                    </div>
+                  )}
                 </td>
                 <td className="p-2">
                   <div className="font-semibold">Refernce no.</div>
@@ -79,14 +102,8 @@ const UserDetails = () => {
                   <div className="font-semibold">Earning</div>
                   {data && data.earning}
                 </td>
-                <td className="p-2">
-                  <div className="font-semibold">UnrealisedEarning </div>
-                  {data && data.unrealisedEarning}
-                </td>
-                <td className="p-2">
-                  <div className="font-semibold">UserStatus</div>
-                  {data && data.userStatus}
-                </td>
+                
+                
                 <td className="p-2">
                   <div className="font-semibold">BankDetails </div>
                   {bankDetails && bankDetails.holderName}

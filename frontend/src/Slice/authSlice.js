@@ -9,7 +9,7 @@ export const fetchUser = createAsyncThunk("fetchUser", async (data) => {
   };
 
   const response = await axios.post(
-    "http://localhost:6001/api/users/login",
+    "https://sevensquaregroup.in/api/users/login",
     { email, password },
     config
   );

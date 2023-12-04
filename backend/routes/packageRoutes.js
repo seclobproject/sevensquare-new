@@ -8,6 +8,42 @@ import Package from "../models/packageModel.js";
 import User from "../models/userModel.js";
 
 // GET: All packages
+// Access to all
+router.get(
+  "/fetch-packages",
+  asyncHandler(async (req, res) => {
+
+    const packages = await Package.find();
+
+    if (packages) {
+      const results = [];
+      packages.map((eachPack) => {
+        const result = {
+          id: eachPack._id,
+          packageName: eachPack.name,
+          amount: eachPack.amount,
+          amountExGST: eachPack.amountExGST,
+          usersCount: eachPack.usersCount,
+          addOnUsers: eachPack.addOnUsers,
+          schemeType: eachPack.schemeType,
+        };
+
+        results.push(result);
+      });
+
+      res.json({
+        sts: "01",
+        msg: "Success",
+        results,
+      });
+      
+    } else {
+      res.status(404).json({ sts: "00", message: "Packages not found!" });
+    }
+  })
+);
+
+// GET: All packages
 // Access to all users
 router.get(
   "/",

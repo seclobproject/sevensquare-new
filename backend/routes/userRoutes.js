@@ -14,21 +14,11 @@ import multer from "multer";
 import Package from "../models/packageModel.js";
 import sendMail from "../config/mailer.js";
 import s3Upload from "../config/s3Service.js";
+import path from 'path';
 // import upload from "../middleware/fileUploadMiddleware.js";
 
 // Register new user
 // POST: By admin/sponser
-
-// Function to find the highest unrealised commission and add it to wallet
-const unrealisedToWallet = (arr) => {
-  if (arr.length === 0) {
-    return 0;
-  }
-  const highestNumber = Math.max(...arr);
-  const highestNumbers = arr.filter((num) => num === highestNumber);
-  const sum = highestNumbers.reduce((acc, num) => acc + num, 0);
-  return sum;
-};
 
 // Function to split salary(14.75) to every sponsers
 const giveSalary = async (user) => {
@@ -124,29 +114,112 @@ router.post(
 
         await giveSalary(user);
 
-        if (
-          sponserUser.children.length === 2 ||
-          sponserUser.children.length === 3
-        ) {
-          const unrealisedAmount = unrealisedToWallet(
-            sponserUser.unrealisedEarning
-          );
+        const updatedUser = await sponserUser.save();
 
-          sponserUser.earning = sponserUser.earning + unrealisedAmount;
-
-          const highestNumber = Math.max(...sponserUser.unrealisedEarning);
-
-          const remainingNumbers = sponserUser.unrealisedEarning.filter(
-            (num) => num !== highestNumber
-          );
-
-          sponserUser.unrealisedEarning = remainingNumbers;
+        if (updatedUser) {
+          await sendMail(user.email, user.name, user.ownSponserId, password);
         }
+
+        res.json({
+          _id: user._id,
+          sponser: user.sponser,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          address: user.address,
+          packageChosen: user.packageChosen,
+          ownSponserId: user.ownSponserId,
+          screenshot: user.screenshot,
+          referenceNo: user.referenceNo,
+          earning: user.earning,
+          pinsLeft: user.pinsLeft,
+          unrealisedEarning: user.unrealisedEarning,
+          children: user.children,
+          isAdmin: user.isAdmin,
+          isSuperAdmin: user.isSuperAdmin,
+          userStatus: user.userStatus,
+        });
+      } else {
+        res.status(400);
+        throw new Error("Some error occured. Make sure you are logged in!");
+      }
+    } else {
+      res.status(400);
+      throw new Error("Registration failed. Please try again!");
+    }
+  })
+);
+
+router.post(
+  "/add-user-to-all",
+  asyncHandler(async (req, res) => {
+    const { name, email, phone, address, packageChosen, password, sponser } =
+      req.body;
+
+    const userStatus = "pending";
+
+    const sponserUser = await User.findById(sponser);
+
+    const ownSponserId = generateRandomString();
+
+    const existingUser = await User.findOne({ email });
+    const existingUserByPhone = await User.findOne({ phone });
+
+    if (existingUser || existingUserByPhone) {
+      res.status(401);
+      throw new Error("User already exists!");
+    }
+
+    let screenshot = null;
+    let referenceNo = null;
+
+    if (req.body.screenshot && req.body.referenceNo) {
+      screenshot = req.body.screenshot;
+      referenceNo = req.body.referenceNo;
+    }
+
+    const earning = 0;
+    const unrealisedEarning = [];
+    const children = [];
+
+    let pinsLeft = 1;
+
+    if (packageChosen) {
+      const packageSelected = await Package.findById(packageChosen);
+
+      if (packageSelected) {
+        pinsLeft = packageSelected.usersCount + packageSelected.addOnUsers;
+      }
+    }
+
+    const user = await User.create({
+      sponser,
+      name,
+      email,
+      phone,
+      address,
+      password,
+      ownSponserId,
+      packageChosen,
+      screenshot,
+      referenceNo,
+      earning,
+      unrealisedEarning,
+      userStatus,
+      children,
+      pinsLeft,
+    });
+
+    if (user) {
+      if (sponserUser) {
+        sponserUser.children.push(user._id);
+
+        await giveSalary(user);
 
         const updatedUser = await sponserUser.save();
 
         if (updatedUser) {
-          await sendMail(user.email, user.name, user.ownSponserId);
+          await sendMail(user.email, user.name, user.ownSponserId, password);
         }
 
         res.json({
@@ -232,14 +305,12 @@ router.post(
   })
 );
 
-
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads");
-  },
+  destination: '/var/www/seclob/sevensquaregroup/uploads',
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "-" + uniqueSuffix);
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e6);
+    const fileExtension = path.extname(file.originalname);
+    cb(null, file.fieldname + "-" + uniqueSuffix + fileExtension);
   },
 });
 
@@ -252,9 +323,8 @@ const upload = multer({ storage: storage });
 router.post(
   "/verify-user",
   protect,
-  upload.single('image'),
+  upload.single("image"),
   asyncHandler(async (req, res) => {
-    
     if (!req.file) {
       res.status(400).json({ message: "No file uploaded" });
     }
@@ -300,11 +370,11 @@ const splitCommissions = async (user, amount, levels, percentages) => {
 
   if (sponser) {
     if (sponser.children.length >= 4) {
-      sponser.earning = sponser.earning + commission;
+      sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
     } else if (sponser.children.length === 2 && percentages[0] === 8) {
-      sponser.earning = sponser.earning + commission;
+      sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
     } else if (sponser.children.length === 3 && percentages[0] === 5) {
-      sponser.earning = sponser.earning + commission;
+      sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
     } else {
       sponser.unrealisedEarning.push(commission);
     }
@@ -314,6 +384,17 @@ const splitCommissions = async (user, amount, levels, percentages) => {
   }
 };
 
+// Function to find the highest unrealised commission and add it to wallet
+const unrealisedToWallet = (arr) => {
+  if (arr.length === 0) {
+    return 0;
+  }
+  const highestNumber = Math.max(...arr);
+  const highestNumbers = arr.filter((num) => num === highestNumber);
+  const sum = highestNumbers.reduce((acc, num) => acc + num, 0);
+  return sum;
+};
+
 router.post(
   "/verify-user-payment",
   superAdmin,
@@ -321,7 +402,9 @@ router.post(
     // const sponserUserId = req.user._id;
 
     const { userId } = req.body;
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("packageChosen");
+
+    let packageType = user.packageChosen.schemeType;
 
     // const sponseredUsers = await User.findById(user).populate({
     //   path: "children",
@@ -336,8 +419,41 @@ router.post(
 
       const updatedUser = await user.save();
 
-      if (updatedUser) {
+      if (updatedUser && packageType === 'staff') {
         const sponserUser = await User.findById(user.sponser);
+
+        // Unrealised to wallet start
+        if (
+          sponserUser.children.length === 2 ||
+          sponserUser.children.length === 3
+        ) {
+          const unrealisedAmount = unrealisedToWallet(
+            sponserUser.unrealisedEarning
+          );
+
+          sponserUser.earning =
+            Math.round((sponserUser.earning + unrealisedAmount) * 10) / 10;
+
+          const highestNumber = Math.max(...sponserUser.unrealisedEarning);
+
+          const remainingNumbers = sponserUser.unrealisedEarning.filter(
+            (num) => num !== highestNumber
+          );
+
+          sponserUser.unrealisedEarning = remainingNumbers;
+        } else if (
+          sponserUser.children.length >= 4 &&
+          sponserUser.unrealisedEarning.length > 0
+        ) {
+          const sum = sponserUser.unrealisedEarning.reduce(
+            (acc, value) => acc + value,
+            0
+          );
+          sponserUser.earning =
+            Math.round((sponserUser.earning + sum) * 10) / 10;
+          sponserUser.unrealisedEarning = [];
+        }
+        // Unrealised to wallet end
 
         const packageSelected = await user.populate({
           path: "packageChosen",
@@ -350,7 +466,8 @@ router.post(
         const packageAmount = packageSelected.packageChosen.amountExGST;
         //NEW
         const sponserCommission = (25 / 100) * packageAmount;
-        sponserUser.earning = sponserUser.earning + sponserCommission;
+        sponserUser.earning =
+          Math.round((sponserUser.earning + sponserCommission) * 10) / 10;
         await sponserUser.save();
 
         splitCommissions(sponserUser, packageAmount, levels, percentages);
@@ -379,28 +496,32 @@ router.get(
 // GET: All users to admin (under that specific admin with his referralID)
 
 const addPackages = async (childrenArray) => {
-  
   let result = [];
 
   for (const child of childrenArray) {
     const user = await User.findById(child._id).populate("packageChosen");
 
-    const packageChosen = user.packageChosen;
+    let packageChosen;
+    if (user.packageChosen) {
+      packageChosen = user.packageChosen;
+    }
 
     if (user) {
       result.push({
+        _id: child._id,
         name: child.name,
         sponserId: child.ownSponserId,
         phone: child.phone,
         email: child.email,
         address: child.address,
+        userStatus: child.userStatus,
         packageName: packageChosen && packageChosen.name,
         packageAmount: packageChosen && packageChosen.amount,
         packageType: packageChosen && packageChosen.schemeType,
       });
     }
   }
-  
+
   return result;
 };
 
@@ -421,9 +542,12 @@ router.get(
     const result = await addPackages(childrenArray);
 
     if (childrenArray.length === 0) {
-      res
-        .status(401)
-        .res({ sts: "00", message: "No members found under you!", userStatus: users.userStatus });
+      res.status(401).res({
+        sts: "00",
+        message: "No members found under you!",
+        userStatus: users.userStatus,
+        result,
+      });
     } else {
       res.status(200).json({ result, userStatus: users.userStatus });
     }

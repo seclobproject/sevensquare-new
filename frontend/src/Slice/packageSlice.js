@@ -2,6 +2,42 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Redux action to get all the packages
+export const fetchPackageForAll = createAsyncThunk(
+  "fetchPackageForAll",
+  async () => {
+    const response = await axios.get(
+      "https://sevensquaregroup.in/api/packages/fetch-packages"
+    );
+
+    return response.data.results;
+  }
+);
+
+export const packageForAllSlice = createSlice({
+  name: "packageForAll",
+  initialState: {
+    loading: false,
+    data: [],
+    error: false,
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchPackageForAll.pending, (state) => {
+      state.loading = true;
+      state.data = null;
+      state.error = false;
+    });
+    builder.addCase(fetchPackageForAll.fulfilled, (state, action) => {
+      state.loading = false;
+      state.data = action.payload;
+      state.error = false;
+    });
+    builder.addCase(fetchPackageForAll.rejected, (state, action) => {
+      console.log("Error", action.payload);
+      state.error = true;
+    });
+  },
+});
+
 export const fetchPackage = createAsyncThunk("fetchPackage", async () => {
   const token = localStorage.getItem("userInfo");
   const parsedData = JSON.parse(token);
@@ -14,7 +50,7 @@ export const fetchPackage = createAsyncThunk("fetchPackage", async () => {
   };
 
   const response = await axios.get(
-    "http://localhost:6001/api/packages",
+    "https://sevensquaregroup.in/api/packages",
     config
   );
   return response.data.results;
@@ -59,7 +95,7 @@ export const addNewPackage = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/api/packages/add-new-package",
+        "https://sevensquaregroup.in/api/packages/add-new-package",
         packageData,
         {
           headers: {
@@ -114,7 +150,7 @@ export const deletePackage = createAsyncThunk("deletePackage", async (id) => {
 
   try {
     const response = await axios.delete(
-      `http://localhost:6001/api/packages/delete/${id}`,
+      `https://sevensquaregroup.in/api/packages/delete/${id}`,
       {
         headers: {
           Authorization: `Bearer ${parsedData.access_token}`,
@@ -168,4 +204,5 @@ export const deletePackage = createAsyncThunk("deletePackage", async (id) => {
 
 export const packageReducer = packageSlice.reducer;
 export const addPackageReducer = addPackageSlice.reducer;
+export const packageForAllReducer = packageForAllSlice.reducer;
 // export const deletePackageReducer1 = deletePackageReducer.reducer;

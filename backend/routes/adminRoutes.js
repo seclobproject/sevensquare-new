@@ -1,14 +1,14 @@
 import express from "express";
 const router = express.Router();
 import Randomstring from "randomstring";
-import { superAdmin } from "../middleware/authMiddleware.js";
+import { protect, superAdmin } from "../middleware/authMiddleware.js";
 
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
 
 router.post(
   "/get-profile",
-  superAdmin,
+  protect,
   asyncHandler(async (req, res) => {
     const { userId } = req.body;
     const user = await User.findById(userId).populate("packageChosen");

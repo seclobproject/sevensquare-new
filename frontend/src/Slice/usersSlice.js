@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+//Fetch/get all users
 export const fetchUsersList = createAsyncThunk("fetchUsersList", async () => {
   const token = localStorage.getItem("userInfo");
   const parsedData = JSON.parse(token);
@@ -13,13 +14,11 @@ export const fetchUsersList = createAsyncThunk("fetchUsersList", async () => {
   };
 
   const response = await axios.get(
-    "http://localhost:6001/api/users/get-users",
+    "https://sevensquaregroup.in/api/users/get-users",
     config
   );
   return response.data;
 });
-
-//slice
 
 export const getUserSlice = createSlice({
   name: "get-user",
@@ -47,6 +46,8 @@ export const getUserSlice = createSlice({
 
 // -----------------------------------------
 
+// Verify user
+
 export const verifyUsers = createAsyncThunk("verifyUsers", async (userId) => {
   const token = localStorage.getItem("userInfo");
   const parsedData = JSON.parse(token);
@@ -59,7 +60,7 @@ export const verifyUsers = createAsyncThunk("verifyUsers", async (userId) => {
   };
 
   const response = await axios.post(
-    "http://localhost:6001/api/users/verify-user-payment",
+    "https://sevensquaregroup.in/api/users/verify-user-payment",
     { userId },
     config
   );
@@ -91,6 +92,8 @@ export const getVerifyUser = createSlice({
   },
 });
 
+// -----------------------------------------
+
 //get user Details
 
 export const userDetails = createAsyncThunk(
@@ -108,7 +111,7 @@ export const userDetails = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/api/admin/get-profile",
+        "https://sevensquaregroup.in/api/admin/get-profile",
         { userId },
         config
       );
@@ -118,8 +121,6 @@ export const userDetails = createAsyncThunk(
     }
   }
 );
-
-// --------------response
 
 export const getUserDetails = createSlice({
   name: "user-Details",
@@ -147,6 +148,52 @@ export const getUserDetails = createSlice({
   },
 });
 
+// Add new user
+
+export const addNewUser = createAsyncThunk("addNewUser", async (user) => {
+  
+  const response = await axios.post(
+    "https://sevensquaregroup.in/api/users/add-user-to-all",
+    {
+      sponser: user.sponser,
+      email: user.email,
+      name: user.username,
+      password: user.password,
+      phone: user.phone,
+      address: user.address,
+      packageChosen: user.packageChosen,
+    }
+  );
+
+  return response.data;
+});
+
+export const getAddNewUser = createSlice({
+  name: "getAddNewUser",
+  initialState: {
+    loading: false,
+    data: null,
+    error: false,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(addNewUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addNewUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(addNewUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+  },
+});
+
 export const getUserReducer = getUserSlice.reducer;
 export const verifyUserReducer = getVerifyUser.reducer;
 export const getUserDetailReducer = getUserDetails.reducer;
+export const getAddNewUserReducer = getAddNewUser.reducer;

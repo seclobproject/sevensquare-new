@@ -37,6 +37,10 @@ const __dirname = path.resolve();
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 // Uploads
 
+
+const appDir = path.resolve(process.cwd());
+console.log(appDir);
+
 // API Points
 
 app.use("/api/users", userRoutes);

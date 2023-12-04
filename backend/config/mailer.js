@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 // create the message object
 
-const sendMail = (mailId, name, sponserid) => {
+const sendMail = (mailId, name, sponserid, password) => {
   const recipient = mailId;
 
   const message = {
@@ -20,7 +20,7 @@ const sendMail = (mailId, name, sponserid) => {
     to: `${recipient}`,
     subject: `Hi ${name}, Registration successful.`,
     text: `Hi ${name}, Welcome to SEVENSQUARE`,
-    html: `<h4>Congrats! You have joined the SEVENSQUARE Group.</h4><p>Your sponserID is <strong>${sponserid}</strong><br/>Please contact your sponser for further details.</p>`,
+    html: `<h4>Congrats! You have joined the SEVENSQUARE Group.</h4><p>Your sponserID is <strong>${sponserid}</strong><br/>Username: ${name}<br />Password: ${password}</p>`,
   };
 
   // send the email

@@ -2,7 +2,11 @@ import express from "express";
 const router = express.Router();
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
-import { protect, protectVerifyStatus } from "../middleware/authMiddleware.js";
+import {
+  protect,
+  protectVerifyStatus,
+  superAdmin,
+} from "../middleware/authMiddleware.js";
 
 // Generate random string fro temperory reference ID
 const generateRandomString = (length) => {
@@ -43,7 +47,6 @@ router.get(
   })
 );
 
-
 // POST: Withdraw from wallet
 // Access to user
 router.post(
@@ -66,12 +69,12 @@ router.post(
           });
 
           const transactionUpdate = await user.save();
-          
+
           if (transactionUpdate) {
             res.status(200).json({
               sts: "01",
               msg: "Withdrawal request sent. The amount will be credited to your account within 48 hours!",
-              transactions: user.transactions
+              transactions: user.transactions,
             });
           } else {
             res.status(401).json({
@@ -90,6 +93,69 @@ router.post(
           sts: "00",
           msg: "Your withdrawal request cannot be processed as your wallet balance is below ₹500!",
         });
+      }
+    } else {
+      res.status(401).json({ sts: "00", msg: "User not found!" });
+    }
+  })
+);
+
+// POST: Get all transactions to User admin
+// Access to super admin
+router.get(
+  "/transactions",
+  protect,
+  asyncHandler(async (req, res) => {
+    const users = await User.find();
+
+    if (users) {
+      let result = [];
+
+      for (let user of users) {
+        if (user.transactions.length !== 0) {
+          result.push({
+            userId: user._id,
+            sponserID: user.ownSponserId,
+            username: user.name,
+            email: user.email,
+            phone: user.phone,
+            transactions: user.transactions,
+          });
+        }
+      }
+
+      res.status(200).json(result);
+    } else {
+      res.status(401).json({ sts: "00", msg: "Can't fetch users!" });
+    }
+  })
+);
+
+router.post(
+  "/verify-transaction",
+  protect,
+  asyncHandler(async (req, res) => {
+    
+    const { userId, referenceId, transId } = req.body;
+    
+    const user = await User.findById(userId);
+
+    if (user) {
+      const transaction = user.transactions.map((trans) => {
+        if (trans._id == transId) {
+          trans.status = "Approved";
+          trans.referenceID = referenceId;
+        }
+      });
+
+      const updatedTrans = await user.save();
+
+      if (updatedTrans) {
+        res.status(201).json({ sts: "01", msg: "Verification successful." });
+      } else {
+        res
+          .status(401)
+          .json({ sts: "00", msg: "Verification failed. Please try again" });
       }
     } else {
       res.status(401).json({ sts: "00", msg: "User not found!" });
