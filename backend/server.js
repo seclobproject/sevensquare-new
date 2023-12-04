@@ -34,9 +34,9 @@ app.use(cookieParser());
 
 // Uploads
 const __dirname = path.resolve();
-app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+app.use("/uploads", express.static("/var/www/seclob/sevensquaregroup/uploads"));
 // Uploads
-
 
 const appDir = path.resolve(process.cwd());
 console.log(appDir);
@@ -56,11 +56,18 @@ app.use("/api/admin", adminRoutes);
 // API Points
 
 if (NODE_ENV == "production") {
-  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+  // app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+  // app.get("*", (req, res) => {
+  //   res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  // });
+
+  app.use(express.static("/var/www/seclob/sevensquaregroup/frontend/dist"));
 
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    res.sendFile("/var/www/seclob/sevensquaregroup/frontend/dist/index.html");
   });
+  
 } else {
   app.get("/", (req, res) => {
     res.status(201).json("Running");
