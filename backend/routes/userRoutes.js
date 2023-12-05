@@ -14,7 +14,7 @@ import multer from "multer";
 import Package from "../models/packageModel.js";
 import sendMail from "../config/mailer.js";
 import s3Upload from "../config/s3Service.js";
-import path from 'path';
+import path from "path";
 // import upload from "../middleware/fileUploadMiddleware.js";
 
 // Register new user
@@ -157,6 +157,7 @@ router.post(
       req.body;
 
     const userStatus = "pending";
+    const imgStatus = "pending";
 
     const sponserUser = await User.findById(sponser);
 
@@ -203,6 +204,7 @@ router.post(
       packageChosen,
       screenshot,
       referenceNo,
+      imgStatus,
       earning,
       unrealisedEarning,
       userStatus,
@@ -234,6 +236,7 @@ router.post(
           screenshot: user.screenshot,
           referenceNo: user.referenceNo,
           earning: user.earning,
+          imgStatus: user.imgStatus,
           pinsLeft: user.pinsLeft,
           unrealisedEarning: user.unrealisedEarning,
           children: user.children,
@@ -306,7 +309,7 @@ router.post(
 );
 
 const storage = multer.diskStorage({
-  destination: '/var/www/seclob/sevensquaregroup/uploads',
+  destination: "/var/www/seclob/sevensquaregroup/uploads",
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e6);
     const fileExtension = path.extname(file.originalname);
@@ -340,12 +343,15 @@ router.post(
     if (user) {
       user.screenshot = req.file.filename;
       user.referenceNo = referenceNo;
+      user.imgStatus = "progress";
 
       const updatedUser = await user.save();
       if (updatedUser) {
-        res
-          .status(201)
-          .json({ updatedUser, sts: "01", msg: "User verification success!" });
+        res.status(201).json({
+          updatedUser,
+          sts: "01",
+          msg: "User verification in progress!",
+        });
       } else {
         res
           .status(400)
@@ -371,10 +377,25 @@ const splitCommissions = async (user, amount, levels, percentages) => {
   if (sponser) {
     if (sponser.children.length >= 4) {
       sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
+
+      sponser.allTransactions.push({
+        amount: commission,
+        status: "approved",
+      });
     } else if (sponser.children.length === 2 && percentages[0] === 8) {
       sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
+
+      sponser.allTransactions.push({
+        amount: commission,
+        status: "approved",
+      });
     } else if (sponser.children.length === 3 && percentages[0] === 5) {
       sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
+
+      sponser.allTransactions.push({
+        amount: commission,
+        status: "approved",
+      });
     } else {
       sponser.unrealisedEarning.push(commission);
     }
@@ -416,10 +437,11 @@ router.post(
 
     if (user) {
       user.userStatus = "approved";
+      user.imgStatus = "approved";
 
       const updatedUser = await user.save();
 
-      if (updatedUser && packageType === 'staff') {
+      if (updatedUser && packageType === "staff") {
         const sponserUser = await User.findById(user.sponser);
 
         // Unrealised to wallet start
@@ -433,6 +455,13 @@ router.post(
 
           sponserUser.earning =
             Math.round((sponserUser.earning + unrealisedAmount) * 10) / 10;
+
+          sponserUser.allTransactions.push({
+            sponserID: updatedUser.sponser,
+            name: updatedUser.name,
+            amount: unrealisedAmount,
+            status: "approved",
+          });
 
           const highestNumber = Math.max(...sponserUser.unrealisedEarning);
 
@@ -452,6 +481,13 @@ router.post(
           sponserUser.earning =
             Math.round((sponserUser.earning + sum) * 10) / 10;
           sponserUser.unrealisedEarning = [];
+
+          sponserUser.allTransactions.push({
+            sponserID: updatedUser.sponser,
+            name: updatedUser.name,
+            amount: sum,
+            status: "approved",
+          });
         }
         // Unrealised to wallet end
 
@@ -468,6 +504,14 @@ router.post(
         const sponserCommission = (25 / 100) * packageAmount;
         sponserUser.earning =
           Math.round((sponserUser.earning + sponserCommission) * 10) / 10;
+
+        sponserUser.allTransactions.push({
+          sponserID: updatedUser.sponser,
+          name: updatedUser.name,
+          amount: sponserCommission,
+          status: "approved",
+        });
+
         await sponserUser.save();
 
         splitCommissions(sponserUser, packageAmount, levels, percentages);
@@ -542,7 +586,7 @@ router.get(
     const result = await addPackages(childrenArray);
 
     if (childrenArray.length === 0) {
-      res.status(401).res({
+      res.status(200).json({
         sts: "00",
         message: "No members found under you!",
         userStatus: users.userStatus,
@@ -661,6 +705,7 @@ router.post(
     const user = await User.findById(userId).populate("packageChosen");
 
     if (user) {
+
       res.json({
         _id: user._id,
         sponser: user.sponser,
@@ -674,10 +719,12 @@ router.post(
         earning: user.earning,
         unrealisedEarning: user.unrealisedEarning,
         userStatus: user.userStatus,
+        imgStatus: user.imgStatus,
         packageChosen: user.packageChosen && user.packageChosen.amount,
         sts: "01",
         msg: "Profile fetched successfully",
       });
+
     } else {
       res.status(401).json({ sts: "00", msg: "User not found" });
     }
@@ -700,7 +747,6 @@ router.put(
       const updatedUser = user.save();
 
       if (updatedUser) {
-        console.log(updatedUser);
         res
           .status(200)
           .json({ sts: "01", msg: "Password changed successfully!" });

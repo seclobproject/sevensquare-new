@@ -51,9 +51,13 @@ router.get(
 // Access to user
 router.post(
   "/withdraw",
-  protectVerifyStatus,
+  protect,
   asyncHandler(async (req, res) => {
     const { amount } = req.body;
+
+    const TDSAmount = amount * 0.1;
+
+    const lastAmount = amount - TDSAmount;
 
     const userId = req.user._id;
 
@@ -65,6 +69,8 @@ router.post(
           user.transactions.push({
             referenceID: generateRandomString(5),
             amount: amount,
+            TDSAmount,
+            lastAmount,
             status: "Pending",
           });
 
@@ -135,9 +141,8 @@ router.post(
   "/verify-transaction",
   protect,
   asyncHandler(async (req, res) => {
-    
     const { userId, referenceId, transId } = req.body;
-    
+
     const user = await User.findById(userId);
 
     if (user) {
@@ -159,6 +164,62 @@ router.post(
       }
     } else {
       res.status(401).json({ sts: "00", msg: "User not found!" });
+    }
+  })
+);
+
+// GET: All transactions (All commissions)
+// Access to user
+router.get(
+  "/all-transactions",
+  protect,
+  asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+
+    if (user) {
+      if (user.allTransactions.length > 0) {
+
+        let result = [];
+
+        for (let transaction of user.allTransactions) {
+          const date = new Date(transaction.createdAt);
+          const options = {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          };
+
+          const formattedDate = new Intl.DateTimeFormat(
+            "en-US",
+            options
+          ).format(date);
+          result.push({ transaction, formattedDate });
+        }
+
+        res.status(200).json({
+          sts: "01",
+          msg: "Success",
+          result,
+          userStatus: user.userStatus,
+        });
+      } else {
+        res.status(200).json({
+          sts: "01",
+          msg: "No transactions present!",
+          userStatus: user.userStatus,
+        });
+      }
+    } else {
+      res.status(404).json({
+        sts: "00",
+        msg: "User not found!",
+        userStatus: user.userStatus,
+      });
     }
   })
 );

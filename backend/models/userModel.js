@@ -5,12 +5,26 @@ const transactionSchema = new mongoose.Schema(
   {
     referenceID: String,
     amount: Number,
+    TDSAmount: Number,
+    lastAmount: Number,
     status: String,
   },
   {
     timestamps: true,
   }
 );
+
+const allTransactionSchema = new mongoose.Schema(
+  {
+    sponserID: String,
+    name: String,
+    amount: Number,
+    status: String
+  },
+  {
+    timestamps: true,
+  }
+)
 
 const userSchema = new mongoose.Schema(
   {
@@ -98,6 +112,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "approved", "rejected"],
     },
+    imgStatus: {
+      type: String,
+      enum: ["pending", "approved", "progress"],
+      default: "pending"
+    },
+    allTransactions: [allTransactionSchema],
     children: [
       {
         type: mongoose.Schema.Types.ObjectId,

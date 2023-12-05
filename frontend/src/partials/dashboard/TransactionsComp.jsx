@@ -21,20 +21,13 @@ function TransactionsComp() {
   const [transId, setTransId] = useState(null);
 
   const { data } = useSelector((state) => state.fetchTransactionReducer);
-  const { data: verifiedData } = useSelector((state) => state.verifyTransactionReducer);
+  const { data: verifiedData } = useSelector(
+    (state) => state.verifyTransactionReducer
+  );
 
   useEffect(() => {
     dispatch(fetchTransactions());
   }, [dispatch, verifiedData]);
-
-  //   const handleVerification = async (id) => {
-  //     dispatch(verifyUsers(id));
-
-  //     window.location.reload();
-  //   };
-  // const HandleDelete = (id) => {
-  //   dispatch(deletePackage(id));
-  // };
 
   const openPopup = (userId, transId) => {
     setUserId(userId);
@@ -50,7 +43,7 @@ function TransactionsComp() {
   };
 
   const submitPopup = (referenceId) => {
-    dispatch(verifyTransaction({referenceId, userId, transId}));
+    dispatch(verifyTransaction({ referenceId, userId, transId }));
   };
 
   return (
@@ -90,6 +83,11 @@ function TransactionsComp() {
                         </div>
                       </th>
                       <th className="p-2">
+                        <div className="font-semibold text-center">
+                          Bank Details
+                        </div>
+                      </th>
+                      <th className="p-2">
                         <div className="font-semibold text-center">Verify</div>
                       </th>
                     </tr>
@@ -112,6 +110,18 @@ function TransactionsComp() {
                           <td className="p-2">
                             <div className="text-center text-slate-800 dark:text-slate-100">
                               {transaction.status}
+                            </div>
+                          </td>
+                          <td className="p-2">
+                            <div className="text-center flex items-center flex-col gap-2">
+                              <Link
+                                to={`/user-details/${user.userId}`}
+                                className="hidden xs:block ml-2"
+                              >
+                                <button className="btn bg-blue-500 hover:bg-blue-600 text-white">
+                                  User/Bank Details
+                                </button>
+                              </Link>
                             </div>
                           </td>
                           <td className="p-2 flex justify-center">

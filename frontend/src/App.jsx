@@ -17,6 +17,7 @@ import VerifyUsersPage from "./pages/VerifyUsersPage";
 import VerifiedUserPage from "./pages/VerifiedUsersPage";
 import Referral from "./pages/Referral";
 import Transactions from "./pages/Transactions";
+import WalletDetails from "./pages/WalletDetails";
 
 function App() {
   const location = useLocation();
@@ -41,6 +42,7 @@ function App() {
         <Route path="/verified-users" element={<VerifiedUserPage />} />
         <Route path="/referral/:sponser" element={<Referral />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/wallet-details" element={<WalletDetails />} />
       </Routes>
     </>
   );

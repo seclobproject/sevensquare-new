@@ -1,113 +1,53 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import LineChart from '../../charts/LineChart01';
-import Icon from '../../images/icon-01.svg';
-import EditMenu from '../../components/DropdownEditMenu';
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 
-// Import utilities
-import { tailwindConfig, hexToRGB } from '../../utils/Utils';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProfileDetails } from "../../Slice/usersSlice";
 
 function DashboardCard01() {
+  const dispatch = useDispatch();
+  const { loading, data, error } = useSelector(
+    (state) => state.fetchProfileReducer
+  );
 
-  const chartData = {
-    labels: [
-      '12-01-2020',
-      '01-01-2021',
-      '02-01-2021',
-      '03-01-2021',
-      '04-01-2021',
-      '05-01-2021',
-      '06-01-2021',
-      '07-01-2021',
-      '08-01-2021',
-      '09-01-2021',
-      '10-01-2021',
-      '11-01-2021',
-      '12-01-2021',
-      '01-01-2022',
-      '02-01-2022',
-      '03-01-2022',
-      '04-01-2022',
-      '05-01-2022',
-      '06-01-2022',
-      '07-01-2022',
-      '08-01-2022',
-      '09-01-2022',
-      '10-01-2022',
-      '11-01-2022',
-      '12-01-2022',
-      '01-01-2023',
-    ],
-    datasets: [
-      // Indigo line
-      {
-        data: [732, 610, 610, 504, 504, 504, 349, 349, 504, 342, 504, 610, 391, 192, 154, 273, 191, 191, 126, 263, 349, 252, 423, 622, 470, 532],
-        fill: true,
-        backgroundColor: `rgba(${hexToRGB(tailwindConfig().theme.colors.blue[500])}, 0.08)`,
-        borderColor: tailwindConfig().theme.colors.indigo[500],
-        borderWidth: 2,
-        tension: 0,
-        pointRadius: 0,
-        pointHoverRadius: 3,
-        pointBackgroundColor: tailwindConfig().theme.colors.indigo[500],
-        pointHoverBackgroundColor: tailwindConfig().theme.colors.indigo[500],
-        pointBorderWidth: 0,
-        pointHoverBorderWidth: 0,
-        clip: 20,
-      },
-      // Gray line
-      {
-        data: [532, 532, 532, 404, 404, 314, 314, 314, 314, 314, 234, 314, 234, 234, 314, 314, 314, 388, 314, 202, 202, 202, 202, 314, 720, 642],
-        borderColor: `rgba(${hexToRGB(tailwindConfig().theme.colors.slate[500])}, 0.25)`,
-        borderWidth: 2,
-        tension: 0,
-        pointRadius: 0,
-        pointHoverRadius: 3,
-        pointBackgroundColor: `rgba(${hexToRGB(tailwindConfig().theme.colors.slate[500])}, 0.25)`,
-        pointHoverBackgroundColor: `rgba(${hexToRGB(tailwindConfig().theme.colors.slate[500])}, 0.25)`,
-        pointBorderWidth: 0,
-        pointHoverBorderWidth: 0,
-        clip: 20,
-      },
-    ],
-  };
+  useEffect(() => {
+    dispatch(fetchProfileDetails());
+  }, [dispatch]);
+
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  let unrealisedSum = 0;
+
+  if (data.unrealisedEarning && data.unrealisedEarning.length > 0) {
+    unrealisedSum = data.unrealisedEarning.reduce(
+      (acc, currentValue) => acc + currentValue,
+      0
+    );
+  }
 
   return (
-    <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
-      <div className="px-5 pt-5">
-        <header className="flex justify-between items-start mb-2">
-          {/* Icon */}
-          <img src={Icon} width="32" height="32" alt="Icon 01" />
-          {/* Menu button */}
-          <EditMenu align="right" className="relative inline-flex">
-            <li>
-              <Link className="font-medium text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-200 flex py-1 px-3" to="#0">
-                Option 1
-              </Link>
-            </li>
-            <li>
-              <Link className="font-medium text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-200 flex py-1 px-3" to="#0">
-                Option 2
-              </Link>
-            </li>
-            <li>
-              <Link className="font-medium text-sm text-rose-500 hover:text-rose-600 flex py-1 px-3" to="#0">
-                Remove
-              </Link>
-            </li>
-          </EditMenu>
-        </header>
-        <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Acme Plus</h2>
-        <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase mb-1">Sales</div>
+    <div className="flex flex-row col-span-full sm:col-span-12 xl:col-span-12 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
+      <div className="w-1/2 px-5 pt-5 pb-5">
+        <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase mb-1">
+          Total Wallet Amount
+        </div>
         <div className="flex items-start">
-          <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mr-2">$24,780</div>
-          <div className="text-sm font-semibold text-white px-1.5 bg-emerald-500 rounded-full">+49%</div>
+          <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mr-2">
+            {data.earning}
+          </div>
         </div>
       </div>
-      {/* Chart built with Chart.js 3 */}
-      <div className="grow max-sm:max-h-[128px] xl:max-h-[128px]">
-        {/* Change the height attribute to adjust the chart height */}
-        <LineChart data={chartData} width={389} height={128} />
+      <div className="w-1/2 px-5 pt-5 pb-5">
+        <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase mb-1">
+          Unrealised Earning
+        </div>
+        <div className="flex items-start">
+          <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mr-2">
+            {unrealisedSum}
+          </div>
+        </div>
       </div>
     </div>
   );

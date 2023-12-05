@@ -82,7 +82,7 @@ export const packageSlice = createSlice({
     });
   },
 });
-////////////////////////////////////////////////////////////////////////
+
 // post method
 
 export const addNewPackage = createAsyncThunk(

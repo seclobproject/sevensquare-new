@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 const Popup = ({ isOpen, onClose, onSubmit }) => {
+
   const [referenceId, setReferenceId] = useState("");
   const [error, setError] = useState(false);
 
@@ -26,7 +27,6 @@ const Popup = ({ isOpen, onClose, onSubmit }) => {
           <div className="bg-slate-300 p-8 rounded-lg shadow-md w-96">
             {/* Title */}
             <div className="mb-4 text-lg font-semibold">Verification</div>
-
             {/* Reference ID input */}
             <div className="mb-4">
               <label

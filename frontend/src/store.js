@@ -2,15 +2,18 @@ import { configureStore } from "@reduxjs/toolkit";
 import { addPackageReducer, packageReducer, packageForAllReducer } from "./Slice/packageSlice";
 import userReducer from "./Slice/authSlice";
 import {
+  fetchProfileReducer,
   getUserReducer,
   verifyUserReducer,
   getUserDetailReducer,
-  getAddNewUserReducer
+  getAddNewUserReducer,
+  getUserByIdReducer
 } from "./Slice/usersSlice";
 import { fetchTransactionReducer, verifyTransactionReducer } from "./Slice/transactionSlice";
 
 export const store = configureStore({
   reducer: {
+    fetchProfileReducer,
     packageReducer,
     userLogin: userReducer,
     addPackageReducer,
@@ -20,6 +23,7 @@ export const store = configureStore({
     packageForAllReducer,
     getAddNewUserReducer,
     fetchTransactionReducer,
-    verifyTransactionReducer
+    verifyTransactionReducer,
+    getUserByIdReducer
   },
 });

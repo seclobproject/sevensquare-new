@@ -58,6 +58,9 @@ function UsersList() {
                   <div className="font-semibold text-center">Address</div>
                 </th>
                 <th className="p-2">
+                  <div className="font-semibold text-center">View Tree</div>
+                </th>
+                <th className="p-2">
                   <div className="font-semibold text-center">View Profile</div>
                 </th>
                 <th className="p-2">
@@ -92,31 +95,24 @@ function UsersList() {
                       <td className="p-2">
                         <div className="text-center">{user.address}</div>
                       </td>
+
                       <td className="p-2">
                         <div className="text-center flex flex-col gap-2">
-                          <Link
-                            to={`/user-details/${user._id}`}
-                            className="hidden xs:block ml-2"
-                          >
+                          <Link to={`/user-details/${user._id}`} className="hidden xs:block ml-2">
+                            <button className="btn bg-blue-500 hover:bg-blue-600 text-white">
+                              View Tree
+                            </button>
+                          </Link>
+                        </div>
+                      </td>
+                      
+                      <td className="p-2">
+                        <div className="text-center flex flex-col gap-2">
+                          <Link to={`/user-details/${user._id}`} className="hidden xs:block ml-2">
                             <button className="btn bg-blue-500 hover:bg-blue-600 text-white">
                               View Profile
                             </button>
                           </Link>
-                          {/* {user.userStatus === "pending" ? (
-                            <button
-                              onClick={() => handleVerification(user._id)}
-                              className="btn bg-indigo-500 hover:bg-indigo-600 text-white"
-                            >
-                              Verify User
-                            </button>
-                          ) : (
-                            <button
-                              disabled={true}
-                              className="btn bg-green-500 hover:bg-green-600 text-white"
-                            >
-                              Verified
-                            </button>
-                          )} */}
                         </div>
                       </td>
 
@@ -127,6 +123,7 @@ function UsersList() {
                           </button>
                         </div>
                       </td>
+
                     </tr>
                   );
                 })}
