@@ -23,7 +23,6 @@ router.post(
     const { holderName, accountNum, ifscCode, bank, aadhar, pan } = req.body;
 
     if (user) {
-      
       user.bankDetails = {
         aadharPhoto: file1.filename,
         panPhoto: file2.filename,
@@ -66,14 +65,20 @@ router.get(
     const user = await User.findById(userId);
 
     if (user) {
-      if (user.bankDetails) {
+      if (user.bankDetails != {}) {
         res.status(200).json({
           bankDetails: user.bankDetails,
           sts: "01",
           msg: "Fetched successfully",
         });
       } else {
-        res.status(404).json({ sts: "00", msg: "Bank details not found!" });
+        res
+          .status(200)
+          .json({
+            bankDetails: user.bankDetails,
+            sts: "00",
+            msg: "Bank details not found!",
+          });
       }
     } else {
       res.status(404).json({ sts: "00", msg: "User not found" });

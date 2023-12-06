@@ -47,15 +47,15 @@ router.post(
       if (user.unrealisedSalary >= 5000) {
         await withdrawSalary(user, 5000);
       }
-    } else if (totalChildren === 1024) {
-      if (user.unrealisedSalary >= 15000) {
+    } else if (totalChildren === 1024) { //1365
+      if (user.unrealisedSalary >= 15000) { //10,000
         await withdrawSalary(user, 15000);
       }
-    } else if (totalChildren === 4096) {
-      if (user.unrealisedSalary >= 60000) {
+    } else if (totalChildren === 4096) { //5461
+      if (user.unrealisedSalary >= 60000) { //25000
         await withdrawSalary(user, 60000);
       }
-    } else if (totalChildren > 4096) {
+    } else if (totalChildren > 4096) { //163.. SOMETHING
       await withdrawSalary(user, user.unrealisedSalary);
     }
 

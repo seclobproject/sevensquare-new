@@ -64,8 +64,8 @@ router.post(
     const user = await User.findById(userId);
 
     if (user) {
-      if (user.earning > 500) {
-        if (amount <= user.earning) {
+      if (user.earning >= 500) {
+        if (lastAmount <= user.earning) {
           user.transactions.push({
             referenceID: generateRandomString(5),
             amount: amount,

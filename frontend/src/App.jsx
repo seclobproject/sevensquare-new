@@ -18,6 +18,7 @@ import VerifiedUserPage from "./pages/VerifiedUsersPage";
 import Referral from "./pages/Referral";
 import Transactions from "./pages/Transactions";
 import WalletDetails from "./pages/WalletDetails";
+import InnerUsers from "./pages/InnerUsers";
 
 function App() {
   const location = useLocation();
@@ -43,6 +44,7 @@ function App() {
         <Route path="/referral/:sponser" element={<Referral />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/wallet-details" element={<WalletDetails />} />
+        <Route path="/users-list/:userId" element={<InnerUsers />} />
       </Routes>
     </>
   );

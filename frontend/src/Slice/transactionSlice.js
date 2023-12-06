@@ -93,5 +93,28 @@ export const verifyTransactionSlice = createSlice({
   },
 });
 
+export const getAllTransactions = createAsyncThunk(
+  "getAllTransactions",
+  async () => {
+    const token = localStorage.getItem("userInfo");
+    const parsedData = JSON.parse(token);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${parsedData.access_token}`,
+        "content-type": "application/json",
+      },
+    };
+
+    const response = await axios.get(
+      "https://sevensquaregroup.in/api/wallet/all-transactions",
+      config
+    );
+    
+    return response.data;
+
+  }
+);
+
 export const fetchTransactionReducer = fetchTransactionSlice.reducer;
 export const verifyTransactionReducer = verifyTransactionSlice.reducer;

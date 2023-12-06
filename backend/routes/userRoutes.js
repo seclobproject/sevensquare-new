@@ -15,6 +15,7 @@ import Package from "../models/packageModel.js";
 import sendMail from "../config/mailer.js";
 import s3Upload from "../config/s3Service.js";
 import path from "path";
+import { log } from "console";
 // import upload from "../middleware/fileUploadMiddleware.js";
 
 // Register new user
@@ -379,6 +380,7 @@ const splitCommissions = async (user, amount, levels, percentages) => {
       sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
 
       sponser.allTransactions.push({
+        name: "Commission credited",
         amount: commission,
         status: "approved",
       });
@@ -386,6 +388,7 @@ const splitCommissions = async (user, amount, levels, percentages) => {
       sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
 
       sponser.allTransactions.push({
+        name: "Commission credited",
         amount: commission,
         status: "approved",
       });
@@ -393,6 +396,7 @@ const splitCommissions = async (user, amount, levels, percentages) => {
       sponser.earning = Math.round((sponser.earning + commission) * 10) / 10;
 
       sponser.allTransactions.push({
+        name: "Commission credited",
         amount: commission,
         status: "approved",
       });
@@ -532,7 +536,10 @@ router.get(
   "/get-users",
   superAdmin,
   asyncHandler(async (req, res) => {
-    const users = await User.find().populate("packageChosen");
+    const users = await User.find()
+      .populate("packageChosen")
+      .populate("sponser");
+
     res.json(users);
   })
 );
@@ -605,7 +612,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const user = await User.findById(id).populate("children");
+    const user = await User.findById(id).populate("children").populate("sponser").populate("packageChosen");
 
     const childrenArray = user.children || [];
 
@@ -705,7 +712,6 @@ router.post(
     const user = await User.findById(userId).populate("packageChosen");
 
     if (user) {
-
       res.json({
         _id: user._id,
         sponser: user.sponser,
@@ -724,7 +730,6 @@ router.post(
         sts: "01",
         msg: "Profile fetched successfully",
       });
-
     } else {
       res.status(401).json({ sts: "00", msg: "User not found" });
     }

@@ -2,25 +2,27 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // GET your(admin) user details
-export const fetchProfileDetails = createAsyncThunk("fetchProfileDetails", async () => {
-  const token = localStorage.getItem("userInfo");
-  const parsedData = JSON.parse(token);
+export const fetchProfileDetails = createAsyncThunk(
+  "fetchProfileDetails",
+  async () => {
+    const token = localStorage.getItem("userInfo");
+    const parsedData = JSON.parse(token);
 
-  const config = {
-    headers: {
-      Authorization: `Bearer ${parsedData.access_token}`,
-      "content-type": "application/json",
-    },
-  };
+    const config = {
+      headers: {
+        Authorization: `Bearer ${parsedData.access_token}`,
+        "content-type": "application/json",
+      },
+    };
 
-  const response = await axios.post(
-    "https://sevensquaregroup.in/api/users/fetch-profile",
-    {},
-    config
-  );
-  return response.data;
-
-});
+    const response = await axios.post(
+      "https://sevensquaregroup.in/api/users/fetch-profile",
+      {},
+      config
+    );
+    return response.data;
+  }
+);
 
 export const fetchProfileSlice = createSlice({
   name: "fetch-profile",
@@ -196,7 +198,7 @@ export const getUserDetails = createSlice({
 // Add new user
 
 export const addNewUser = createAsyncThunk("addNewUser", async (user) => {
-  
+
   const response = await axios.post(
     "https://sevensquaregroup.in/api/users/add-user-to-all",
     {
@@ -252,12 +254,12 @@ export const getUserById = createAsyncThunk("getUserById", async (userId) => {
     },
   };
 
-  const response = await axios.post(
+  const response = await axios.get(
     `https://sevensquaregroup.in/api/users/get-user-by-id/${id}`,
     config
   );
-  return response.data;
 
+  return response.data;
 });
 
 export const getUserByIdSlice = createSlice({
@@ -269,20 +271,21 @@ export const getUserByIdSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchProfileDetails.pending, (state) => {
+    builder.addCase(getUserById.pending, (state) => {
       state.loading = true;
       state.error = false;
     });
-    builder.addCase(fetchProfileDetails.fulfilled, (state, action) => {
+    builder.addCase(getUserById.fulfilled, (state, action) => {
       state.loading = false;
       state.data = action.payload;
     });
-    builder.addCase(fetchProfileDetails.rejected, (state, action) => {
+    builder.addCase(getUserById.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message;
     });
   },
 });
+
 
 export const fetchProfileReducer = fetchProfileSlice.reducer;
 export const getUserReducer = getUserSlice.reducer;

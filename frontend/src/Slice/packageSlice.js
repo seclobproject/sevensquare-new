@@ -106,7 +106,6 @@ export const addNewPackage = createAsyncThunk(
       );
 
       const data = response.data;
-      console.log(data);
 
       return data;
     } catch (error) {
@@ -167,42 +166,8 @@ export const deletePackage = createAsyncThunk("deletePackage", async (id) => {
   }
 });
 
-// -----------------------slice
-
-// export const deletePackageReducer = createSlice({
-//   name: "deletePackage",
-//   initialState: {
-//     deletedPackageId: null,
-//     loading: false,
-//     error: null,
-//   },
-//   extraReducers: (builder) => {
-//     builder.addCase(deletePackage.pending, (state) => {
-//       state.loading = true;
-//     });
-
-//     builder.addCase(deletePackage.fulfilled, (state, action) => {
-//       const deletedPackageId = action.payload;
-//       state.deletedPackageId = deletedPackageId;
-//       state.loading = false;
-
-//       // updating.............
-//       const updatedPackages = state.packages.filter(
-//         (package) => package.id !== deletedPackageId
-//       );
-//       state.packages = updatedPackages;
-//     });
-
-//     builder.addCase(deletePackage.rejected, (state, action) => {
-//       state.loading = false;
-//       state.error = action.error.message;
-//     });
-//   },
-// });
-
 // -----------------------------------
 
 export const packageReducer = packageSlice.reducer;
 export const addPackageReducer = addPackageSlice.reducer;
 export const packageForAllReducer = packageForAllSlice.reducer;
-// export const deletePackageReducer1 = deletePackageReducer.reducer;

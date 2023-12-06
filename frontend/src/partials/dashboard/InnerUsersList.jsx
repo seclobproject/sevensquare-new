@@ -1,28 +1,48 @@
 import React, { useEffect, useState } from "react";
 
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useParams } from "react-router-dom";
 
 // Redux imports start
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsersList, verifyUsers } from "../../Slice/usersSlice";
+import { getUserById, verifyUsers } from "../../Slice/usersSlice";
 import axios from "axios";
 import EditPopup from "./EditPopup";
 
 // Redux imports end
 
-function UsersList() {
-  const dispatch = useDispatch();
+function InnerUsersList() {
+  const [isPopupOpen, setPopupOpen] = useState(false);
 
-  const { data } = useSelector((state) => state.getUserReducer);
+  const dispatch = useDispatch();
+  const { userId } = useParams();
+
+  const { data } = useSelector((state) => state.getUserByIdReducer);
 
   useEffect(() => {
-    dispatch(fetchUsersList());
-  }, [dispatch]);
+    dispatch(getUserById(userId));
+  }, [dispatch, userId]);
 
-  const handleVerification = async (id) => {
-    dispatch(verifyUsers(id));
+  // const handleVerification = async (id) => {
+  //   dispatch(verifyUsers(id));
 
-    window.location.reload();
+  //   window.location.reload();
+  // };
+
+  const openPopup = (userId, transId) => {
+    // setUserId(userId);
+    // setTransId(transId);
+
+    setPopupOpen(true);
+  };
+
+  const closePopup = () => {
+    // setUserId(null);
+    // setTransId(null);
+    setPopupOpen(false);
+  };
+
+  const submitPopup = (referenceId) => {
+    // dispatch(verifyTransaction({ referenceId, userId, transId }));
   };
 
   return (
@@ -75,8 +95,8 @@ function UsersList() {
               </thead>
               {/* Table body */}
               <tbody className="text-sm font-medium divide-y divide-slate-100 dark:divide-slate-700">
-                {data &&
-                  data.map((user) => {
+                {data.members &&
+                  data.members.map((user) => {
                     const formattedDate = new Intl.DateTimeFormat("en-US", {
                       day: "numeric",
                       month: "long",
@@ -95,20 +115,20 @@ function UsersList() {
                         </td>
                         <td className="p-2">
                           <div className="text-center">
-                            {user.sponser && user.sponser.name}
+                            {data.sponserUser && data.sponserUser.name}
                           </div>
-                        </td>
-                        <td className="p-2">
-                          <div className="text-center">{user.name}</div>
                         </td>
                         <td className="p-2">
                           <div className="text-center text-emerald-500">
-                            {user.phone}
+                            {user.name}
                           </div>
                         </td>
                         <td className="p-2">
+                          <div className="text-center">{user.phone}</div>
+                        </td>
+                        <td className="p-2">
                           <div className="text-center">
-                            {user.packageChosen && user.packageChosen.amount}
+                            {user.packageAmount}
                           </div>
                         </td>
                         <td className="p-2">
@@ -143,13 +163,14 @@ function UsersList() {
 
                         <td className="p-2">
                           <div className="text-center">
-                            <Link>
-                              <button
-                                className="btn bg-blue-600 hover:bg-blue-700 text-white"
-                              >
-                                Edit
-                              </button>
-                            </Link>
+                            <button
+                              onClick={() =>
+                                openPopup()
+                              }
+                              className="btn bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              Edit
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -160,8 +181,13 @@ function UsersList() {
           </div>
         </div>
       </div>
+      <EditPopup
+        isOpen={isPopupOpen}
+        onClose={closePopup}
+        onSubmit={submitPopup}
+      />
     </>
   );
 }
 
-export default UsersList;
+export default InnerUsersList;
