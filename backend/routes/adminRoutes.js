@@ -5,6 +5,7 @@ import { protect, superAdmin } from "../middleware/authMiddleware.js";
 
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
+import Worker from "../models/workerModel.js";
 
 router.post(
   "/get-profile",
@@ -21,6 +22,22 @@ router.post(
         msg: "User not found",
       });
     }
+  })
+);
+
+// GET All pins to admin
+router.post(
+  "/get-all-pins",
+  protect,
+  asyncHandler(async (req, res) => {
+    const pins = await Worker.find().populate("addedBy");
+
+    if (pins) {
+      res.status(200).json(pins);
+    } else {
+      res.status(404).json({ msg: "No PINS found!" });
+    }
+
   })
 );
 

@@ -4,11 +4,15 @@ import { Link, NavLink } from "react-router-dom";
 
 // Redux imports start
 import { useDispatch, useSelector } from "react-redux";
-import { editUserProfile, fetchUsersList, verifyUsers } from "../../Slice/usersSlice";
+import {
+  editUserProfile,
+  fetchUsersList,
+  verifyUsers,
+} from "../../Slice/usersSlice";
 import EditPopup from "./EditPopup";
 // Redux imports end
 
-function UsersList() {
+function FranchiseUsersList() {
   const [filterStatus, setFilterStatus] = useState("");
   const [search, setSearch] = useState("");
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -17,7 +21,15 @@ function UsersList() {
 
   const dispatch = useDispatch();
 
-  const { data } = useSelector((state) => state.getUserReducer);
+  const { data: franchiseData } = useSelector((state) => state.getUserReducer);
+
+  let data = [];
+  franchiseData &&
+    franchiseData.map((user) => {
+      if (user.packageChosen && user.packageChosen.schemeType === "franchise") {
+        data.push(user);
+      }
+    });
 
   useEffect(() => {
     dispatch(fetchUsersList());
@@ -41,7 +53,7 @@ function UsersList() {
       <div className="col-span-full xl:col-span-12 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
         <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
           <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-            Users
+            Franchise Users
           </h2>
         </header>
         <div className="p-3">
@@ -215,4 +227,4 @@ function UsersList() {
   );
 }
 
-export default UsersList;
+export default FranchiseUsersList;

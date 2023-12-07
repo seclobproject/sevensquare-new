@@ -19,6 +19,8 @@ import Referral from "./pages/Referral";
 import Transactions from "./pages/Transactions";
 import WalletDetails from "./pages/WalletDetails";
 import InnerUsers from "./pages/InnerUsers";
+import FranchiseUsers from "./pages/FranchiseUsers";
+import UserPins from "./pages/UserPins";
 
 function App() {
   const location = useLocation();
@@ -36,8 +38,10 @@ function App() {
         <Route exact path="/" element={<Signin />} />
         <Route path="/packages" element={<Packages />} />
         <Route path="/dashboard" element={<Packages />} />
-        <Route path="/add-new" element={<PackageForm />} />
         <Route path="/users" element={<Users />} />
+        <Route path="/userpins" element={<UserPins />} />
+        <Route path="/add-new" element={<PackageForm />} />
+        <Route path="/franchise-users" element={<FranchiseUsers />} />
         <Route path="/user-details/:userId" element={<UserDetails />} />
         <Route path="/verify-users" element={<VerifyUsersPage />} />
         <Route path="/verified-users" element={<VerifiedUserPage />} />

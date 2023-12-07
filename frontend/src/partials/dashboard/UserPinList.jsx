@@ -4,11 +4,16 @@ import { Link, NavLink } from "react-router-dom";
 
 // Redux imports start
 import { useDispatch, useSelector } from "react-redux";
-import { editUserProfile, fetchUsersList, verifyUsers } from "../../Slice/usersSlice";
+import {
+  editUserProfile,
+  fetchUsersList,
+  verifyUsers,
+} from "../../Slice/usersSlice";
 import EditPopup from "./EditPopup";
+import { fetchPins } from "../../Slice/pinSlice";
 // Redux imports end
 
-function UsersList() {
+function UserPinList() {
   const [filterStatus, setFilterStatus] = useState("");
   const [search, setSearch] = useState("");
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -20,7 +25,7 @@ function UsersList() {
   const { data } = useSelector((state) => state.getUserReducer);
 
   useEffect(() => {
-    dispatch(fetchUsersList());
+    dispatch(fetchPins());
   }, [dispatch]);
 
   const openPopup = (userId) => {
@@ -41,7 +46,7 @@ function UsersList() {
       <div className="col-span-full xl:col-span-12 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
         <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
           <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-            Users
+            User Pins
           </h2>
         </header>
         <div className="p-3">
@@ -74,35 +79,18 @@ function UsersList() {
               <thead className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm">
                 <tr>
                   <th className="p-2">
-                    <div className="font-semibold text-left">Date</div>
+                    <div className="font-semibold text-left">Sponser ID</div>
                   </th>
                   <th className="p-2">
                     <div className="font-semibold text-left">Sponsor Name</div>
-                  </th>
-                  <th className="p-2">
-                    <div className="font-semibold text-center">Name</div>
                   </th>
                   <th className="p-2">
                     <div className="font-semibold text-center">Phone</div>
                   </th>
                   <th className="p-2">
                     <div className="font-semibold text-center">
-                      Package Amount
+                      View Pins
                     </div>
-                  </th>
-                  <th className="p-2">
-                    <div className="font-semibold text-center">Status</div>
-                  </th>
-                  <th className="p-2">
-                    <div className="font-semibold text-center">View Tree</div>
-                  </th>
-                  <th className="p-2">
-                    <div className="font-semibold text-center">
-                      View Profile
-                    </div>
-                  </th>
-                  <th className="p-2">
-                    <div className="font-semibold text-center">Edit</div>
                   </th>
                 </tr>
               </thead>
@@ -215,4 +203,4 @@ function UsersList() {
   );
 }
 
-export default UsersList;
+export default UserPinList;

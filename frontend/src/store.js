@@ -1,5 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { addPackageReducer, packageReducer, packageForAllReducer } from "./Slice/packageSlice";
+import {
+  addPackageReducer,
+  packageReducer,
+  packageForAllReducer,
+} from "./Slice/packageSlice";
 import userReducer from "./Slice/authSlice";
 import {
   fetchProfileReducer,
@@ -7,9 +11,13 @@ import {
   verifyUserReducer,
   getUserDetailReducer,
   getAddNewUserReducer,
-  getUserByIdReducer
+  getUserByIdReducer,
 } from "./Slice/usersSlice";
-import { fetchTransactionReducer, verifyTransactionReducer } from "./Slice/transactionSlice";
+import {
+  fetchTransactionReducer,
+  verifyTransactionReducer,
+} from "./Slice/transactionSlice";
+import { fetchPinsReducer } from "./Slice/pinSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +32,7 @@ export const store = configureStore({
     getAddNewUserReducer,
     fetchTransactionReducer,
     verifyTransactionReducer,
-    getUserByIdReducer
+    getUserByIdReducer,
+    fetchPinsReducer,
   },
 });

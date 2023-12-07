@@ -37,7 +37,7 @@ const Referral = () => {
       username.trim() !== "" &&
       email.trim() !== "" &&
       password.trim().length >= 8 &&
-      phone.trim().length === 10 &&
+      phone.trim().length >= 10 &&
       address.trim() !== "" &&
       packageChosen !== "Select"
     );
@@ -207,7 +207,7 @@ const Referral = () => {
                   role="alert"
                 >
                   <span className="block sm:inline">
-                    Submitted successfully
+                    Congratulations. You are registered successfully. Please download Seven Square mobile application.
                   </span>
                   <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
                     <svg
@@ -226,7 +226,7 @@ const Referral = () => {
                   className="bg-red-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
                   role="alert"
                 >
-                  <span className="block sm:inline">loading...</span>
+                  <span className="block sm:inline">{error}</span>
                   <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
                     <svg
                       className="fill-current h-6 w-6 text-green-500"
@@ -249,7 +249,7 @@ const Referral = () => {
                   </span>
                   <br />
                   <span className="block sm:inline">
-                    Password should have atleast 8 characters
+                    Password should have atleast 8 characters.
                   </span>
                   <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
                     <svg

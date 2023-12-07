@@ -4,7 +4,7 @@ import { Link, NavLink, useParams } from "react-router-dom";
 
 // Redux imports start
 import { useDispatch, useSelector } from "react-redux";
-import { getUserById, verifyUsers } from "../../Slice/usersSlice";
+import { editUserProfile, getUserById, verifyUsers } from "../../Slice/usersSlice";
 import axios from "axios";
 import EditPopup from "./EditPopup";
 
@@ -12,6 +12,9 @@ import EditPopup from "./EditPopup";
 
 function InnerUsersList() {
   const [isPopupOpen, setPopupOpen] = useState(false);
+
+  // Edit button clicked user_id
+  const [user_Id, setUser_Id] = useState("");
 
   const dispatch = useDispatch();
   const { userId } = useParams();
@@ -22,27 +25,18 @@ function InnerUsersList() {
     dispatch(getUserById(userId));
   }, [dispatch, userId]);
 
-  // const handleVerification = async (id) => {
-  //   dispatch(verifyUsers(id));
 
-  //   window.location.reload();
-  // };
-
-  const openPopup = (userId, transId) => {
-    // setUserId(userId);
-    // setTransId(transId);
-
+  const openPopup = (userId) => {
+    setUser_Id(userId);
     setPopupOpen(true);
   };
 
   const closePopup = () => {
-    // setUserId(null);
-    // setTransId(null);
     setPopupOpen(false);
   };
 
-  const submitPopup = (referenceId) => {
-    // dispatch(verifyTransaction({ referenceId, userId, transId }));
+  const submitPopup = (formData) => {
+    dispatch(editUserProfile({user_Id, formData}))
   };
 
   return (
@@ -164,9 +158,7 @@ function InnerUsersList() {
                         <td className="p-2">
                           <div className="text-center">
                             <button
-                              onClick={() =>
-                                openPopup()
-                              }
+                              onClick={() => openPopup(user._id)}
                               className="btn bg-blue-600 hover:bg-blue-700 text-white"
                             >
                               Edit
@@ -185,6 +177,7 @@ function InnerUsersList() {
         isOpen={isPopupOpen}
         onClose={closePopup}
         onSubmit={submitPopup}
+        userId={user_Id}
       />
     </>
   );

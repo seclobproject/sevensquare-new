@@ -15,7 +15,7 @@ export const fetchTransactions = createAsyncThunk(
     };
 
     const response = await axios.get(
-      "https://sevensquaregroup.in/api/wallet/transactions",
+      "http://localhost:6001/api/wallet/transactions",
       config
     );
     return response.data;
@@ -60,7 +60,7 @@ export const verifyTransaction = createAsyncThunk(
     };
 
     const response = await axios.post(
-      "https://sevensquaregroup.in/api/wallet/verify-transaction",
+      "http://localhost:6001/api/wallet/verify-transaction",
       { referenceId, userId, transId },
       config
     );
@@ -107,7 +107,7 @@ export const getAllTransactions = createAsyncThunk(
     };
 
     const response = await axios.get(
-      "https://sevensquaregroup.in/api/wallet/all-transactions",
+      "http://localhost:6001/api/wallet/all-transactions",
       config
     );
     

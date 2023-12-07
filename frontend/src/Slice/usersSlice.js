@@ -16,7 +16,7 @@ export const fetchProfileDetails = createAsyncThunk(
     };
 
     const response = await axios.post(
-      "https://sevensquaregroup.in/api/users/fetch-profile",
+      "http://localhost:6001/api/users/fetch-profile",
       {},
       config
     );
@@ -61,7 +61,7 @@ export const fetchUsersList = createAsyncThunk("fetchUsersList", async () => {
   };
 
   const response = await axios.get(
-    "https://sevensquaregroup.in/api/users/get-users",
+    "http://localhost:6001/api/users/get-users",
     config
   );
   return response.data;
@@ -107,7 +107,7 @@ export const verifyUsers = createAsyncThunk("verifyUsers", async (userId) => {
   };
 
   const response = await axios.post(
-    "https://sevensquaregroup.in/api/users/verify-user-payment",
+    "http://localhost:6001/api/users/verify-user-payment",
     { userId },
     config
   );
@@ -139,6 +139,27 @@ export const getVerifyUser = createSlice({
   },
 });
 
+// Reject Users
+export const rejectUser = createAsyncThunk("rejectUser", async (userId) => {
+  const token = localStorage.getItem("userInfo");
+  const parsedData = JSON.parse(token);
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${parsedData.access_token}`,
+      "content-type": "application/json",
+    },
+  };
+
+  const response = await axios.post(
+    "http://localhost:6001/api/users/reject-user",
+    { userId },
+    config
+  );
+
+  return response.data;
+});
+
 // -----------------------------------------
 
 //get user Details
@@ -158,7 +179,7 @@ export const userDetails = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "https://sevensquaregroup.in/api/admin/get-profile",
+        "http://localhost:6001/api/admin/get-profile",
         { userId },
         config
       );
@@ -198,9 +219,8 @@ export const getUserDetails = createSlice({
 // Add new user
 
 export const addNewUser = createAsyncThunk("addNewUser", async (user) => {
-
   const response = await axios.post(
-    "https://sevensquaregroup.in/api/users/add-user-to-all",
+    "http://localhost:6001/api/users/add-user-to-all",
     {
       sponser: user.sponser,
       email: user.email,
@@ -235,7 +255,9 @@ export const getAddNewUser = createSlice({
       })
       .addCase(addNewUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        if(action.error.message === 'Request failed with status code 401'){
+          state.error = 'User already exists!';
+        }
       });
   },
 });
@@ -255,7 +277,7 @@ export const getUserById = createAsyncThunk("getUserById", async (userId) => {
   };
 
   const response = await axios.get(
-    `https://sevensquaregroup.in/api/users/get-user-by-id/${id}`,
+    `http://localhost:6001/api/users/get-user-by-id/${id}`,
     config
   );
 
@@ -286,6 +308,44 @@ export const getUserByIdSlice = createSlice({
   },
 });
 
+// Edit Profile
+export const editUserProfile = createAsyncThunk(
+  "editUserProfile",
+  async ({ user_Id, formData }) => {
+    const name = formData.name;
+    const phone = formData.phone;
+    const email = formData.email;
+    const address = formData.address;
+    const password = formData.password;
+    const packageChosen = formData.packageChosen;
+
+    const token = localStorage.getItem("userInfo");
+    const parsedData = JSON.parse(token);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${parsedData.access_token}`,
+        "content-type": "application/json",
+      },
+    };
+
+    const response = await axios.put(
+      `http://localhost:6001/api/users/edit-profile`,
+      {
+        user_Id,
+        name,
+        phone,
+        email,
+        address,
+        password,
+        packageChosen,
+      },
+      config
+    );
+
+    return response.data;
+  }
+);
 
 export const fetchProfileReducer = fetchProfileSlice.reducer;
 export const getUserReducer = getUserSlice.reducer;

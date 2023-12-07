@@ -148,14 +148,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               {/* Inbox */}
               <li
                 className={`px-3 py-2 rounded-sm mb-0.5 last:mb-0 ${
-                  pathname.includes("inbox") && "bg-slate-900"
+                  pathname.includes("packages") && "bg-slate-900"
                 }`}
               >
                 <NavLink
                   end
                   to="/packages"
                   className={`block text-slate-200 truncate transition duration-150 ${
-                    pathname.includes("inbox")
+                    pathname.includes("packages")
                       ? "hover:text-slate-200"
                       : "hover:text-white"
                   }`}
@@ -164,7 +164,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     <svg className="shrink-0 h-6 w-6" viewBox="0 0 24 24">
                       <path
                         className={`fill-current ${
-                          pathname.includes("inbox")
+                          pathname.includes("packages")
                             ? "text-indigo-500"
                             : "text-slate-600"
                         }`}
@@ -172,7 +172,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                       />
                       <path
                         className={`fill-current ${
-                          pathname.includes("inbox")
+                          pathname.includes("packages")
                             ? "text-indigo-300"
                             : "text-slate-400"
                         }`}
@@ -253,6 +253,22 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
+                              to="/users"
+                              className={({ isActive }) =>
+                                "block transition duration-150 truncate " +
+                                (isActive
+                                  ? "text-indigo-500"
+                                  : "text-slate-400 hover:text-slate-200")
+                              }
+                            >
+                              <span className="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                                All Users
+                              </span>
+                            </NavLink>
+                          </li>
+                          <li className="mb-1 last:mb-0">
+                            <NavLink
+                              end
                               to="/verify-users"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " +
@@ -285,7 +301,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="/users"
+                              to="/franchise-users"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " +
                                 (isActive
@@ -294,7 +310,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                               }
                             >
                               <span className="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                                All Users
+                                Franchise Users
                               </span>
                             </NavLink>
                           </li>
@@ -305,8 +321,74 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 }}
               </SidebarLinkGroup>
 
+              <li
+                className={`px-3 py-2 rounded-sm mb-0.5 last:mb-0 ${
+                  pathname.includes("userpin") && "bg-slate-900"
+                }`}
+              >
+                <NavLink
+                  end
+                  to="/userpins"
+                  className={`block text-slate-200 truncate transition duration-150 ${
+                    pathname.includes("userpin")
+                      ? "hover:text-slate-200"
+                      : "hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <svg className="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                      <circle
+                        className={`fill-current ${
+                          pathname.includes("userpin")
+                            ? "text-indigo-300"
+                            : "text-slate-400"
+                        }`}
+                        cx="18.5"
+                        cy="5.5"
+                        r="4.5"
+                      />
+                      <circle
+                        className={`fill-current ${
+                          pathname.includes("userpin")
+                            ? "text-indigo-500"
+                            : "text-slate-600"
+                        }`}
+                        cx="5.5"
+                        cy="5.5"
+                        r="4.5"
+                      />
+                      <circle
+                        className={`fill-current ${
+                          pathname.includes("userpin")
+                            ? "text-indigo-500"
+                            : "text-slate-600"
+                        }`}
+                        cx="18.5"
+                        cy="18.5"
+                        r="4.5"
+                      />
+                      <circle
+                        className={`fill-current ${
+                          pathname.includes("userpin")
+                            ? "text-indigo-300"
+                            : "text-slate-400"
+                        }`}
+                        cx="5.5"
+                        cy="18.5"
+                        r="4.5"
+                      />
+                    </svg>
+                    <span className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                      User Pins
+                    </span>
+                  </div>
+                </NavLink>
+              </li>
+
               <SidebarLinkGroup
-                activecondition={pathname === "/" || pathname.includes("wallet")}
+                activecondition={
+                  pathname === "/" || pathname.includes("wallet")
+                }
               >
                 {(handleClick, open) => {
                   return (

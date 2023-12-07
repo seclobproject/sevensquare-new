@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsersList, verifyUsers } from "../../Slice/usersSlice";
+import { fetchUsersList, rejectUser, verifyUsers } from "../../Slice/usersSlice";
+import ModalImage from "react-modal-image";
 
 function VerifyUsersComponent() {
   const dispatch = useDispatch();
@@ -12,13 +13,17 @@ function VerifyUsersComponent() {
   let users = [];
   data &&
     data.map((user) => {
-      if (user.userStatus === "pending") {
+      if (user.imgStatus === "progress") {
         users.push(user);
       }
     });
 
   const handleVerification = async (id) => {
     dispatch(verifyUsers(id));
+  };
+  
+  const rejectVerification = async (id) => {
+    dispatch(rejectUser(id));
   };
 
   useEffect(() => {
@@ -52,7 +57,10 @@ function VerifyUsersComponent() {
                   <div className="font-semibold text-center">Phone</div>
                 </th>
                 <th className="p-2">
-                  <div className="font-semibold text-center">Address</div>
+                  <div className="font-semibold text-center">Screenshot</div>
+                </th>
+                <th className="p-2">
+                  <div className="font-semibold text-center">Reference ID</div>
                 </th>
                 <th className="p-2">
                   <div className="font-semibold text-center">Verify</div>
@@ -82,8 +90,25 @@ function VerifyUsersComponent() {
                     <td className="p-2">
                       <div className="text-center">{user.phone}</div>
                     </td>
+                    <td
+                      className="p-2"
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {user && (
+                        <div style={{ width: "80px" }}>
+                          <ModalImage
+                            small={`https://sevensquaregroup.in/uploads/${user.screenshot}`}
+                            large={`https://sevensquaregroup.in/uploads/${user.screenshot}`}
+                            alt="screenshot"
+                          />
+                        </div>
+                      )}
+                    </td>
                     <td className="p-2">
-                      <div className="text-center">{user.address}</div>
+                      <div className="text-center">{user.referenceNo}</div>
                     </td>
                     <td className="p-2">
                       <div className="text-center flex flex-col gap-2">
@@ -91,7 +116,15 @@ function VerifyUsersComponent() {
                           className="btn bg-blue-500 hover:bg-blue-600 text-white"
                           onClick={() => handleVerification(user._id)}
                         >
-                          Verify User
+                          Verify
+                        </button>
+                      </div>
+                      <div className="text-center flex flex-col gap-2 mt-1">
+                        <button
+                          className="btn bg-blue-500 hover:bg-blue-600 text-white"
+                          onClick={() => rejectVerification(user._id)}
+                        >
+                          Reject
                         </button>
                       </div>
                     </td>

@@ -6,7 +6,7 @@ export const fetchPackageForAll = createAsyncThunk(
   "fetchPackageForAll",
   async () => {
     const response = await axios.get(
-      "https://sevensquaregroup.in/api/packages/fetch-packages"
+      "http://localhost:6001/api/packages/fetch-packages"
     );
 
     return response.data.results;
@@ -50,7 +50,7 @@ export const fetchPackage = createAsyncThunk("fetchPackage", async () => {
   };
 
   const response = await axios.get(
-    "https://sevensquaregroup.in/api/packages",
+    "http://localhost:6001/api/packages",
     config
   );
   return response.data.results;
@@ -95,7 +95,7 @@ export const addNewPackage = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "https://sevensquaregroup.in/api/packages/add-new-package",
+        "http://localhost:6001/api/packages/add-new-package",
         packageData,
         {
           headers: {
@@ -149,7 +149,7 @@ export const deletePackage = createAsyncThunk("deletePackage", async (id) => {
 
   try {
     const response = await axios.delete(
-      `https://sevensquaregroup.in/api/packages/delete/${id}`,
+      `http://localhost:6001/api/packages/delete/${id}`,
       {
         headers: {
           Authorization: `Bearer ${parsedData.access_token}`,

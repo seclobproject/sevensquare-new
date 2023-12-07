@@ -12,10 +12,8 @@ import {
 } from "../middleware/authMiddleware.js";
 import multer from "multer";
 import Package from "../models/packageModel.js";
-import sendMail from "../config/mailer.js";
-import s3Upload from "../config/s3Service.js";
 import path from "path";
-import { log } from "console";
+// import sendMail from "../config/mailer.js";
 // import upload from "../middleware/fileUploadMiddleware.js";
 
 // Register new user
@@ -221,9 +219,9 @@ router.post(
 
         const updatedUser = await sponserUser.save();
 
-        if (updatedUser) {
-          await sendMail(user.email, user.name, user.ownSponserId, password);
-        }
+        // if (updatedUser) {
+        //   await sendMail(user.email, user.name, user.ownSponserId, password);
+        // }
 
         res.json({
           _id: user._id,
@@ -431,15 +429,8 @@ router.post(
 
     let packageType = user.packageChosen.schemeType;
 
-    // const sponseredUsers = await User.findById(user).populate({
-    //   path: "children",
-    // });
-
-    // const theUser = sponseredUsers.children.find((child) =>
-    //   child._id.equals(userId)
-    // );
-
     if (user) {
+      // Approve the user by uploaded screenshots
       user.userStatus = "approved";
       user.imgStatus = "approved";
 
@@ -531,6 +522,31 @@ router.post(
   })
 );
 
+// POST: Reject user verification
+// By super admin
+router.post(
+  "/reject-user",
+  superAdmin,
+  asyncHandler(async (req, res) => {
+    const { userId } = req.body;
+    const user = await User.findById(userId);
+
+    if (user) {
+      user.userStatus = "pending";
+      user.imgStatus = "pending";
+
+      const updatedUser = await user.save();
+
+      if (updatedUser) {
+        res.status(200).json({ msg: "User verification rejected!" })
+      }
+
+    } else {
+      res.status(404).json({ msg: "User not found!" });
+    }
+  })
+);
+
 // GET: All users to Super admin
 router.get(
   "/get-users",
@@ -612,7 +628,10 @@ router.get(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const user = await User.findById(id).populate("children").populate("sponser").populate("packageChosen");
+    const user = await User.findById(id)
+      .populate("children")
+      .populate("sponser")
+      .populate("packageChosen");
 
     const childrenArray = user.children || [];
 
@@ -667,39 +686,39 @@ router.get(
 
 // PUT: Edit user profile
 // Access to admin
-router.put(
-  "/edit-profile",
-  protect,
-  asyncHandler(async (req, res) => {
-    const userId = req.user._id;
+// router.put(
+//   "/edit-profile",
+//   protect,
+//   asyncHandler(async (req, res) => {
+//     const userId = req.user._id;
 
-    const { name, email, phone, address, password } = req.body;
+//     const { name, email, phone, address, password } = req.body;
 
-    const user = await User.findById(userId);
+//     const user = await User.findById(userId);
 
-    if (user) {
-      user.name = name;
-      user.email = email || user.email;
-      user.phone = phone || user.phone;
-      user.address = address || user.address;
-      user.password = password || user.password;
-    }
-    const updatedUser = await user.save();
+//     if (user) {
+//       user.name = name;
+//       user.email = email || user.email;
+//       user.phone = phone || user.phone;
+//       user.address = address || user.address;
+//       user.password = password || user.password;
+//     }
+//     const updatedUser = await user.save();
 
-    if (updatedUser) {
-      res.status(200).json({
-        name,
-        email,
-        phone,
-        address,
-      });
-    } else {
-      res
-        .status(404)
-        .json({ message: "Error occured! Please verify you are logged in!" });
-    }
-  })
-);
+//     if (updatedUser) {
+//       res.status(200).json({
+//         name,
+//         email,
+//         phone,
+//         address,
+//       });
+//     } else {
+//       res
+//         .status(404)
+//         .json({ message: "Error occured! Please verify you are logged in!" });
+//     }
+//   })
+// );
 
 // POST: Fetch profile of the user
 // Access to admin/user
@@ -758,6 +777,43 @@ router.put(
       } else {
         res.status(401).json({ sts: "00", msg: "Password changing failed!" });
       }
+    }
+  })
+);
+
+// PUT: Edit Profile for super admin
+// Access to super admin
+router.put(
+  "/edit-profile",
+  superAdmin,
+  asyncHandler(async (req, res) => {
+    console.log(req.body.user_Id);
+
+    const user = await User.findById(req.body.user_Id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.number = req.body.phone || user.phone;
+      user.address = req.body.address || user.address;
+      user.packageChosen = req.body.packageChosen || user.packageChosen;
+
+      if (req.body.password) {
+        user.password = req.body.password;
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        number: updatedUser.number,
+        isAdmin: updatedUser.isAdmin,
+      });
+    } else {
+      res.status(404);
+      throw new Error("User not found");
     }
   })
 );
