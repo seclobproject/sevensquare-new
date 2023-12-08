@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { URL } from "../Constant";
 
 export const fetchTransactions = createAsyncThunk(
   "fetchTransactions",
@@ -15,7 +16,7 @@ export const fetchTransactions = createAsyncThunk(
     };
 
     const response = await axios.get(
-      "https://sevensquaregroup.in/api/wallet/transactions",
+      `${URL}/api/wallet/transactions`,
       config
     );
     return response.data;
@@ -60,7 +61,7 @@ export const verifyTransaction = createAsyncThunk(
     };
 
     const response = await axios.post(
-      "https://sevensquaregroup.in/api/wallet/verify-transaction",
+      `${URL}/api/wallet/verify-transaction`,
       { userId, transId },
       config
     );
@@ -107,7 +108,7 @@ export const rejectTransaction = createAsyncThunk(
     };
 
     const response = await axios.post(
-      "https://sevensquaregroup.in/api/wallet/reject-transaction",
+      `${URL}/api/wallet/reject-transaction`,
       { userId, transId },
       config
     );
@@ -130,7 +131,7 @@ export const getAllTransactions = createAsyncThunk(
     };
 
     const response = await axios.get(
-      "https://sevensquaregroup.in/api/wallet/all-transactions",
+      `${URL}/api/wallet/all-transactions`,
       config
     );
 

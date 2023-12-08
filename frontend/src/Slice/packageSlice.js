@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { URL } from "../Constant";
 
 // Redux action to get all the packages
 export const fetchPackageForAll = createAsyncThunk(
   "fetchPackageForAll",
   async () => {
     const response = await axios.get(
-      "https://sevensquaregroup.in/api/packages/fetch-packages"
+      `${URL}/api/packages/fetch-packages`
     );
 
     return response.data.results;
@@ -50,7 +51,7 @@ export const fetchPackage = createAsyncThunk("fetchPackage", async () => {
   };
 
   const response = await axios.get(
-    "https://sevensquaregroup.in/api/packages",
+    `${URL}/api/packages`,
     config
   );
   return response.data.results;
@@ -95,7 +96,7 @@ export const addNewPackage = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "https://sevensquaregroup.in/api/packages/add-new-package",
+        `${URL}/api/packages/add-new-package`,
         packageData,
         {
           headers: {
@@ -149,7 +150,7 @@ export const deletePackage = createAsyncThunk("deletePackage", async (id) => {
 
   try {
     const response = await axios.delete(
-      `https://sevensquaregroup.in/api/packages/delete/${id}`,
+      `${URL}/api/packages/delete/${id}`,
       {
         headers: {
           Authorization: `Bearer ${parsedData.access_token}`,

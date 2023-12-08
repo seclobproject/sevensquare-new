@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { URL } from "../Constant";
 
 // Redux action to get user
 export const fetchPins = createAsyncThunk("fetchPins", async () => {
@@ -14,7 +15,7 @@ export const fetchPins = createAsyncThunk("fetchPins", async () => {
   };
 
   const response = await axios.get(
-    "https://sevensquaregroup.in/api/admin/get-all-pins",
+    `${URL}/api/admin/get-all-pins`,
     config
   );
 

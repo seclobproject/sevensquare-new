@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { URL } from "../Constant";
 
 // Edit Profile
 export const addBonus = createAsyncThunk(
@@ -20,7 +21,7 @@ export const addBonus = createAsyncThunk(
     };
 
     const response = await axios.post(
-      `https://sevensquaregroup.in/api/admin/add-bonus`,
+      `${URL}/api/admin/add-bonus`,
       {
         user_Id,
         note,

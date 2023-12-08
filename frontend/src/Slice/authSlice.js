@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { URL } from "../Constant";
 
 // Redux action to get user
 export const fetchUser = createAsyncThunk("fetchUser", async (data) => {
@@ -9,7 +10,7 @@ export const fetchUser = createAsyncThunk("fetchUser", async (data) => {
   };
 
   const response = await axios.post(
-    "https://sevensquaregroup.in/api/users/login",
+    `${URL}/api/users/login`,
     { email, password },
     config
   );

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { URL } from "../Constant";
 
 // GET your(admin) user details
 export const fetchProfileDetails = createAsyncThunk(
@@ -16,7 +17,7 @@ export const fetchProfileDetails = createAsyncThunk(
     };
 
     const response = await axios.post(
-      "https://sevensquaregroup.in/api/users/fetch-profile",
+      `${URL}/api/users/fetch-profile`,
       {},
       config
     );
@@ -61,7 +62,7 @@ export const fetchUsersList = createAsyncThunk("fetchUsersList", async () => {
   };
 
   const response = await axios.get(
-    "https://sevensquaregroup.in/api/users/get-users",
+    `${URL}/api/users/get-users`,
     config
   );
   return response.data;
@@ -107,7 +108,7 @@ export const verifyUsers = createAsyncThunk("verifyUsers", async (userId) => {
   };
 
   const response = await axios.post(
-    "https://sevensquaregroup.in/api/users/verify-user-payment",
+    `${URL}/api/users/verify-user-payment`,
     { userId },
     config
   );
@@ -152,7 +153,7 @@ export const rejectUser = createAsyncThunk("rejectUser", async (userId) => {
   };
 
   const response = await axios.post(
-    "https://sevensquaregroup.in/api/users/reject-user",
+    `${URL}/api/users/reject-user`,
     { userId },
     config
   );
@@ -179,7 +180,7 @@ export const userDetails = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "https://sevensquaregroup.in/api/admin/get-profile",
+        `${URL}/api/admin/get-profile`,
         { userId },
         config
       );
@@ -220,7 +221,7 @@ export const getUserDetails = createSlice({
 
 export const addNewUser = createAsyncThunk("addNewUser", async (user) => {
   const response = await axios.post(
-    "https://sevensquaregroup.in/api/users/add-user-to-all",
+    `${URL}/api/users/add-user-to-all`,
     {
       sponser: user.sponser,
       email: user.email,
@@ -277,7 +278,7 @@ export const getUserById = createAsyncThunk("getUserById", async (userId) => {
   };
 
   const response = await axios.get(
-    `https://sevensquaregroup.in/api/users/get-user-by-id/${id}`,
+    `${URL}/api/users/get-user-by-id/${id}`,
     config
   );
 
@@ -330,7 +331,7 @@ export const editUserProfile = createAsyncThunk(
     };
 
     const response = await axios.put(
-      `https://sevensquaregroup.in/api/users/edit-profile`,
+      `${URL}/api/users/edit-profile`,
       {
         user_Id,
         name,
