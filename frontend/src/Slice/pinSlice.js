@@ -3,13 +3,18 @@ import axios from "axios";
 
 // Redux action to get user
 export const fetchPins = createAsyncThunk("fetchPins", async () => {
-    
+  const token = localStorage.getItem("userInfo");
+  const parsedData = JSON.parse(token);
+
   const config = {
-    headers: { "content-type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${parsedData.access_token}`,
+      "content-type": "application/json",
+    },
   };
 
-  const response = await axios.post(
-    "http://localhost:6001/api/admin/get-all-pins",
+  const response = await axios.get(
+    "https://sevensquaregroup.in/api/admin/get-all-pins",
     config
   );
 
@@ -26,12 +31,12 @@ const fetchPinsSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchPins.pending, (state) => {
       state.pending = true;
-      state.userInfo = null;
+      state.data = null;
       state.error = false;
     });
     builder.addCase(fetchPins.fulfilled, (state, action) => {
       state.pending = true;
-      state.userInfo = action.payload;
+      state.data = action.payload;
       state.error = false;
     });
     builder.addCase(fetchPins.rejected, (state, action) => {

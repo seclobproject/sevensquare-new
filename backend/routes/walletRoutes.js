@@ -137,11 +137,12 @@ router.get(
   })
 );
 
+// Approve Transaction
 router.post(
   "/verify-transaction",
   protect,
   asyncHandler(async (req, res) => {
-    const { userId, referenceId, transId } = req.body;
+    const { userId, transId } = req.body;
 
     const user = await User.findById(userId);
 
@@ -149,18 +150,48 @@ router.post(
       const transaction = user.transactions.map((trans) => {
         if (trans._id == transId) {
           trans.status = "Approved";
-          trans.referenceID = referenceId;
         }
       });
 
       const updatedTrans = await user.save();
 
       if (updatedTrans) {
-        res.status(201).json({ sts: "01", msg: "Verification successful." });
+        res.status(201).json({ sts: "01", msg: "Approval successful." });
       } else {
         res
           .status(401)
-          .json({ sts: "00", msg: "Verification failed. Please try again" });
+          .json({ sts: "00", msg: "Approval failed. Please try again" });
+      }
+    } else {
+      res.status(401).json({ sts: "00", msg: "User not found!" });
+    }
+  })
+);
+
+// Reject Transaction
+router.post(
+  "/reject-transaction",
+  protect,
+  asyncHandler(async (req, res) => {
+    const { userId, transId } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (user) {
+      const transaction = user.transactions.map((trans) => {
+        if (trans._id == transId) {
+          trans.status = "Rejected";
+        }
+      });
+
+      const updatedTrans = await user.save();
+
+      if (updatedTrans) {
+        res.status(201).json({ sts: "01", msg: "Transaction rejected" });
+      } else {
+        res
+          .status(401)
+          .json({ sts: "00", msg: "Rejection failed. Please try again" });
       }
     } else {
       res.status(401).json({ sts: "00", msg: "User not found!" });
@@ -180,7 +211,6 @@ router.get(
 
     if (user) {
       if (user.allTransactions.length > 0) {
-
         let result = [];
 
         for (let transaction of user.allTransactions) {

@@ -13,7 +13,7 @@ import {
 import multer from "multer";
 import Package from "../models/packageModel.js";
 import path from "path";
-// import sendMail from "../config/mailer.js";
+import sendMail from "../config/mailer.js";
 // import upload from "../middleware/fileUploadMiddleware.js";
 
 // Register new user
@@ -787,7 +787,6 @@ router.put(
   "/edit-profile",
   superAdmin,
   asyncHandler(async (req, res) => {
-    console.log(req.body.user_Id);
 
     const user = await User.findById(req.body.user_Id);
 

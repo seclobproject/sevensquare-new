@@ -21,7 +21,7 @@ import DashboardCard12 from "../partials/dashboard/DashboardCard12";
 import DashboardCard13 from "../partials/dashboard/DashboardCard13";
 
 import { NavLink } from "react-router-dom";
-import TransactionsComp from "../partials/dashboard/TransactionsComp";
+import TransactionsComp from "../partials/dashboard/WithdrawalsComp";
 import MyTransactionsComp from "../partials/dashboard/MyTransactionsComp";
 
 function WalletDetails() {

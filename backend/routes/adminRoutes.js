@@ -26,9 +26,9 @@ router.post(
 );
 
 // GET All pins to admin
-router.post(
+router.get(
   "/get-all-pins",
-  protect,
+  superAdmin,
   asyncHandler(async (req, res) => {
     const pins = await Worker.find().populate("addedBy");
 
@@ -37,7 +37,37 @@ router.post(
     } else {
       res.status(404).json({ msg: "No PINS found!" });
     }
+  })
+);
 
+// Add bonus
+router.post(
+  "/add-bonus",
+  protect,
+  asyncHandler(async (req, res) => {
+    
+    const user = await User.findById(req.body.user_Id);
+
+    const amount = parseInt(req.body.amount, 10);
+
+    if (user) {
+
+      user.earning = user.earning + amount;
+      user.allTransactions.push({
+        sponserID: "Admin",
+        name: req.body.note,
+        amount,
+        status: "approved",
+      });
+      
+      const updatedUser = await user.save();
+
+      if (updatedUser) {
+        res.status(201).json({ msg: "Added successfully!" });
+      }
+    } else {
+      res.status(404).json({ msg: "User not found!" });
+    }
   })
 );
 

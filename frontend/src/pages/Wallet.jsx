@@ -4,11 +4,13 @@ import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
 
 import { NavLink } from "react-router-dom";
-import WithdrawalsComp from "../partials/dashboard/WithdrawalsComp";
+import WalletList from "../partials/dashboard/Walletlist";
 
-function Transactions() {
+function Wallet() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+  const userId = userInfo._id;
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -25,13 +27,12 @@ function Transactions() {
             {/* Dashboard actions */}
             <div className="sm:flex sm:justify-between sm:items-center mb-8">
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                {/* Add view button */}
               </div>
             </div>
 
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
-              <WithdrawalsComp />
+              <WalletList />
             </div>
           </div>
         </main>
@@ -41,4 +42,4 @@ function Transactions() {
   );
 }
 
-export default Transactions;
+export default Wallet;

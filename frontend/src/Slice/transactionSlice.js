@@ -15,7 +15,7 @@ export const fetchTransactions = createAsyncThunk(
     };
 
     const response = await axios.get(
-      "http://localhost:6001/api/wallet/transactions",
+      "https://sevensquaregroup.in/api/wallet/transactions",
       config
     );
     return response.data;
@@ -48,7 +48,7 @@ export const fetchTransactionSlice = createSlice({
 
 export const verifyTransaction = createAsyncThunk(
   "verify-transaction",
-  async ({referenceId, userId, transId}) => {
+  async ({ userId, transId }) => {
     const token = localStorage.getItem("userInfo");
     const parsedData = JSON.parse(token);
 
@@ -60,8 +60,8 @@ export const verifyTransaction = createAsyncThunk(
     };
 
     const response = await axios.post(
-      "http://localhost:6001/api/wallet/verify-transaction",
-      { referenceId, userId, transId },
+      "https://sevensquaregroup.in/api/wallet/verify-transaction",
+      { userId, transId },
       config
     );
 
@@ -93,6 +93,29 @@ export const verifyTransactionSlice = createSlice({
   },
 });
 
+export const rejectTransaction = createAsyncThunk(
+  "reject-transaction",
+  async ({ userId, transId }) => {
+    const token = localStorage.getItem("userInfo");
+    const parsedData = JSON.parse(token);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${parsedData.access_token}`,
+        "content-type": "application/json",
+      },
+    };
+
+    const response = await axios.post(
+      "https://sevensquaregroup.in/api/wallet/reject-transaction",
+      { userId, transId },
+      config
+    );
+
+    return response.data;
+  }
+);
+
 export const getAllTransactions = createAsyncThunk(
   "getAllTransactions",
   async () => {
@@ -107,12 +130,11 @@ export const getAllTransactions = createAsyncThunk(
     };
 
     const response = await axios.get(
-      "http://localhost:6001/api/wallet/all-transactions",
+      "https://sevensquaregroup.in/api/wallet/all-transactions",
       config
     );
-    
-    return response.data;
 
+    return response.data;
   }
 );
 
