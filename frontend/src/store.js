@@ -16,6 +16,7 @@ import {
 import {
   fetchTransactionReducer,
   verifyTransactionReducer,
+  rejectTransactionReducer,
 } from "./Slice/transactionSlice";
 import { fetchPinsReducer } from "./Slice/pinSlice";
 
@@ -32,6 +33,7 @@ export const store = configureStore({
     getAddNewUserReducer,
     fetchTransactionReducer,
     verifyTransactionReducer,
+    rejectTransactionReducer,
     getUserByIdReducer,
     fetchPinsReducer,
   },

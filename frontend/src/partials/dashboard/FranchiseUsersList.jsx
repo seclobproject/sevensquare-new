@@ -63,14 +63,14 @@ function FranchiseUsersList() {
               name="phone"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search By Name"
-              className="border border-slate-900 rounded py-2 px-3 bg-slate-700 mb-2"
+              className="border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700 mb-2"
               required
             />
             <div className="flex items-center">
               Filter Status:&nbsp;&nbsp;
               <select
                 value={filterStatus}
-                className="border border-slate-900 rounded py-2 px-3 bg-slate-700 sm:text-sm focus:ring-primary-600 focus:border-primary-600 block p-2.5"
+                className="border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700 sm:text-sm focus:ring-primary-600 focus:border-primary-600 block p-2.5"
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
                 <option value="">All</option>

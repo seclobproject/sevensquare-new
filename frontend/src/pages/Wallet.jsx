@@ -2,9 +2,8 @@ import React, { useState } from "react";
 
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
-
+import WalletList from '../partials/dashboard/WalletList';
 import { NavLink } from "react-router-dom";
-import WalletList from "../partials/dashboard/Walletlist";
 
 function Wallet() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

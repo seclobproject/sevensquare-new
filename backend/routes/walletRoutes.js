@@ -121,6 +121,7 @@ router.get(
         if (user.transactions.length !== 0) {
           result.push({
             userId: user._id,
+            bankDetails: user.bankDetails,
             sponserID: user.ownSponserId,
             username: user.name,
             email: user.email,

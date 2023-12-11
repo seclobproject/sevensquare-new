@@ -15,7 +15,7 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
 
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
+    phone: 0,
     email: "",
     address: "",
     password: "",
@@ -45,14 +45,14 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
           {/* Popup */}
-          <div className="bg-slate-800 p-8 rounded-lg shadow-md w-96">
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-md w-96">
             {/* Title */}
             <div className="mb-4 text-lg font-semibold">Edit Profile</div>
             {/* Reference ID input */}
             <div className="mb-4">
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
-                  <label className="block text-white text-sm font-bold mb-2">
+                  <label className="block dark:text-white text-sm font-bold mb-2">
                     Name
                   </label>
                   <input
@@ -60,13 +60,13 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full border border-slate-900 rounded py-2 px-3 bg-slate-700"
+                    className="w-full border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700"
                     required
                   />
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-white text-sm font-bold mb-2">
+                  <label className="block dark:text-white text-sm font-bold mb-2">
                     Phone
                   </label>
                   <input
@@ -74,13 +74,13 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full border border-slate-900 rounded py-2 px-3 bg-slate-700"
+                    className="w-full border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700"
                     required
                   />
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-white text-sm font-bold mb-2">
+                  <label className="block dark:text-white text-sm font-bold mb-2">
                     Email
                   </label>
                   <input
@@ -88,13 +88,13 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full border border-slate-900 rounded py-2 px-3 bg-slate-700"
+                    className="w-full border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700"
                     required
                   />
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-white text-sm font-bold mb-2">
+                  <label className="block dark:text-white text-sm font-bold mb-2">
                     Address
                   </label>
                   <input
@@ -102,13 +102,13 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    className="w-full border border-slate-900 rounded py-2 px-3 bg-slate-700"
+                    className="w-full border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700"
                     required
                   />
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-white text-sm font-bold mb-2">
+                  <label className="block dark:text-white text-sm font-bold mb-2">
                     Password
                   </label>
                   <input
@@ -116,7 +116,7 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full border border-slate-900 rounded py-2 px-3 bg-slate-700"
+                    className="w-full border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700"
                     required
                   />
                 </div>
@@ -124,7 +124,7 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
                 <div>
                   <label
                     htmlFor="packageChosen"
-                    className="block mb-2 text-sm text-white font-bold"
+                    className="block mb-2 text-sm dark:text-white font-bold"
                   >
                     Package
                   </label>
@@ -133,7 +133,7 @@ const EditPopup = ({ isOpen, onClose, onSubmit }) => {
                     id="packageChosen"
                     defaultValue={formData.packageChosen}
                     onChange={handleInputChange}
-                    className="w-full border border-slate-900 rounded py-2 px-3 bg-slate-700 sm:text-sm focus:ring-primary-600 focus:border-primary-600 block p-2.5"
+                    className="w-full border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700 sm:text-sm focus:ring-primary-600 focus:border-primary-600 block p-2.5"
                     required
                   >
                     <option value="">Select a package</option>

@@ -44,11 +44,13 @@ function DashboardCard10(props) {
                 </td>
                 <td className="p-2 whitespace-nowrap">
                   <div className="text-left font-medium text-green-500">
-                  {props.phone}
+                    {props.phone}
                   </div>
                 </td>
                 <td className="p-2 whitespace-nowrap">
-                  <div className="text-lg">{props.sponserID}</div>
+                  <div className="font-medium text-slate-800 dark:text-slate-100">
+                    {props.sponserID}
+                  </div>
                 </td>
               </tr>
             </tbody>

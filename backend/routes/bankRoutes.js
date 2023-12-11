@@ -65,7 +65,7 @@ router.get(
     const user = await User.findById(userId);
 
     if (user) {
-      if (JSON.stringify(user.bankDetails) != {}) {
+      if (JSON.stringify(user.bankDetails) != '{}') {
         res.status(200).json({
           bankDetails: user.bankDetails,
           sts: "01",

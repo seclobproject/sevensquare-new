@@ -28,7 +28,7 @@ function VerifiedUsersComponent() {
     <div className="col-span-full xl:col-span-12 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
       <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
         <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-          verifyUsers
+          Verified Users
         </h2>
       </header>
       <div className="p-3">
@@ -53,9 +53,6 @@ function VerifiedUsersComponent() {
                 <th className="p-2">
                   <div className="font-semibold text-center">Address</div>
                 </th>
-                <th className="p-2">
-                  <div className="font-semibold text-center">Verify</div>
-                </th>
               </tr>
             </thead>
             {/* Table body */}
@@ -66,7 +63,7 @@ function VerifiedUsersComponent() {
                     <td className="p-2">
                       <div className="flex items-center">
                         <div className="text-slate-800 dark:text-slate-100">
-                          {user.ownSponserId}
+                          {user.sponser && user.sponser.name}
                         </div>
                       </div>
                     </td>
@@ -83,23 +80,6 @@ function VerifiedUsersComponent() {
                     </td>
                     <td className="p-2">
                       <div className="text-center">{user.address}</div>
-                    </td>
-                    <td className="p-2">
-                      {/* {user.userStatus === "approved" && (
-                        <div className="text-center flex flex-col gap-2">
-                          <Link
-                            to={`/verified-users/${user._id}`}
-                            className="hidden xs:block ml-2"
-                          >
-                            <button
-                              className="btn bg-blue-500 hover:bg-blue-600 text-white"
-                              onClick={() => handleVerification(user._id)}
-                            >
-                              Verify User
-                            </button>
-                          </Link>
-                        </div>
-                      )} */}
                     </td>
                   </tr>
                 ))}

@@ -184,6 +184,7 @@ export const userDetails = createAsyncThunk(
         { userId },
         config
       );
+      
       return response.data;
     } catch (error) {
       console.error(error);
@@ -310,7 +311,7 @@ export const getUserByIdSlice = createSlice({
 });
 
 // Edit Profile
-export const editUserProfile = createAsyncThunk(
+export const  editUserProfile = createAsyncThunk(
   "editUserProfile",
   async ({ user_Id, formData }) => {
     const name = formData.name;

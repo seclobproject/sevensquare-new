@@ -58,7 +58,7 @@ function WalletList() {
               name="phone"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search By Name"
-              className="border border-slate-900 rounded py-2 px-3 bg-slate-700 mb-2"
+              className="border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700 mb-2"
               required
             />
           </div>
@@ -86,17 +86,17 @@ function WalletList() {
                       <table className="table-auto w-full dark:text-slate-300">
                         <thead className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm">
                           <tr>
-                            <th className="p-2">
+                            <th className="p-2" style={{ width: "20%" }}>
                               <div className="font-semibold text-left">
                                 Name
                               </div>
                             </th>
-                            <th className="p-2">
+                            <th className="p-2" style={{ width: "20%" }}>
                               <div className="font-semibold text-center">
                                 Sponsor Name
                               </div>
                             </th>
-                            <th className="p-2">
+                            <th className="p-2" style={{ width: "15%" }}>
                               <div className="font-semibold text-center">
                                 Amount
                               </div>
@@ -106,7 +106,7 @@ function WalletList() {
                                 View Transactions
                               </div>
                             </th>
-                            <th className="p-2">
+                            <th className="p-2" style={{ width: "20%" }}>
                               <div className="font-semibold text-center">
                                 Add Bonus
                               </div>
@@ -116,23 +116,23 @@ function WalletList() {
                         {/* Table body */}
                         <tbody className="text-sm font-medium divide-y divide-slate-100 dark:divide-slate-700">
                           <tr>
-                            <td className="p-2">
+                            <td className="p-2" style={{ width: "20%" }}>
                               <div className="flex items-center">
                                 <div className="text-slate-800 dark:text-slate-100">
                                   {user.name}
                                 </div>
                               </div>
                             </td>
-                            <td className="p-2">
+                            <td className="p-2" style={{ width: "20%" }}>
                               <div className="text-center">
                                 {user.sponser && user.sponser.name}
                               </div>
                             </td>
-                            <td className="p-2">
+                            <td className="p-2" style={{ width: "15%" }}>
                               <div className="text-center">{user.earning}</div>
                             </td>
-
-                            <td className="p-2 flex justify-center">
+                            <td
+                              className="p-2 flex justify-center">
                               <div className="text-center flex flex-col gap-2">
                                 <button
                                   onClick={() => toggleHandler(user._id)}
@@ -142,8 +142,7 @@ function WalletList() {
                                 </button>
                               </div>
                             </td>
-
-                            <td className="p-2">
+                            <td className="p-2" style={{ width: "20%" }}>
                               <div className="text-center">
                                 <Link>
                                   <button

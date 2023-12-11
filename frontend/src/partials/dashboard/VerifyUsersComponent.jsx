@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsersList, rejectUser, verifyUsers } from "../../Slice/usersSlice";
+import {
+  fetchUsersList,
+  rejectUser,
+  verifyUsers,
+} from "../../Slice/usersSlice";
 import ModalImage from "react-modal-image";
 
 function VerifyUsersComponent() {
@@ -13,7 +17,7 @@ function VerifyUsersComponent() {
   let users = [];
   data &&
     data.map((user) => {
-      if (user.imgStatus === "progress") {
+      if (user.imgStatus == "progress") {
         users.push(user);
       }
     });
@@ -21,20 +25,20 @@ function VerifyUsersComponent() {
   const handleVerification = async (id) => {
     dispatch(verifyUsers(id));
   };
-  
+
   const rejectVerification = async (id) => {
     dispatch(rejectUser(id));
   };
 
   useEffect(() => {
     dispatch(fetchUsersList());
-  }, [dispatch, handleVerification]);
+  }, [dispatch, handleVerification,data]);
 
   return (
     <div className="col-span-full xl:col-span-12 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
       <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
         <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-          verifyUsers
+          Verify Users
         </h2>
       </header>
       <div className="p-3">
@@ -75,7 +79,7 @@ function VerifyUsersComponent() {
                     <td className="p-2">
                       <div className="flex items-center">
                         <div className="text-slate-800 dark:text-slate-100">
-                          {user.ownSponserId}
+                          {user.sponser.name}
                         </div>
                       </div>
                     </td>

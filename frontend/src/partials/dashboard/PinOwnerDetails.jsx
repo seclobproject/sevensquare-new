@@ -39,7 +39,7 @@ function PinOwnerDetails(props) {
                   </div>
                 </td>
                 <td className="p-2 whitespace-nowrap">
-                  <div className="text-lg">{props.phone}</div>
+                  <div className="font-medium">{props.phone}</div>
                 </td>
                 <td className="p-2 whitespace-nowrap">
                   <button

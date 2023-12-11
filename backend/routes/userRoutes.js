@@ -793,7 +793,7 @@ router.put(
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
-      user.number = req.body.phone || user.phone;
+      user.phone = req.body.phone || user.phone;
       user.address = req.body.address || user.address;
       user.packageChosen = req.body.packageChosen || user.packageChosen;
 
@@ -807,7 +807,7 @@ router.put(
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
-        number: updatedUser.number,
+        phone: updatedUser.phone,
         isAdmin: updatedUser.isAdmin,
       });
     } else {

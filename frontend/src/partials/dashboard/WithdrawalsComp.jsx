@@ -11,7 +11,7 @@ import {
   verifyTransaction,
 } from "../../Slice/transactionSlice";
 import DashboardCard10 from "./DashboardCard10";
-import Popup from "./Popup";
+import BankDetailsPopup from "./bankDetailsPopup";
 
 // Redux imports end
 
@@ -19,32 +19,26 @@ function WithdrawalsComp() {
   const dispatch = useDispatch();
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterStatus, setFilterStatus] = useState("Pending");
+
+  const [bankDetails, setBankDetails] = useState({});
 
   const { data } = useSelector((state) => state.fetchTransactionReducer);
+
   const { data: verifiedData } = useSelector(
     (state) => state.verifyTransactionReducer
   );
 
+  const { data: rejectedData } = useSelector(
+    (state) => state.rejectTransactionReducer
+  );
+
   useEffect(() => {
     dispatch(fetchTransactions());
-  }, [dispatch, verifiedData]);
-
-  const openPopup = (userId, transId) => {
-    setUserId(userId);
-    setTransId(transId);
-
-    setPopupOpen(true);
-  };
+  }, [dispatch, verifiedData, rejectedData]);
 
   const closePopup = () => {
-    setUserId(null);
-    setTransId(null);
     setPopupOpen(false);
-  };
-
-  const submitPopup = (referenceId) => {
-    dispatch(verifyTransaction({ userId, transId }));
   };
 
   const approvePay = (userId, transId) => {
@@ -61,6 +55,11 @@ function WithdrawalsComp() {
     }
   };
 
+  const bankDetailFn = (bank) => {
+    setBankDetails(bank);
+    if (bankDetails) setPopupOpen(true);
+  };
+
   return (
     <div className="col-span-full xl:col-span-12 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
       <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
@@ -75,17 +74,16 @@ function WithdrawalsComp() {
             name="phone"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search By Name"
-            className="border border-slate-900 rounded py-2 px-3 bg-slate-700 mb-2"
+            className="border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700 mb-2"
             required
           />
           <div className="flex items-center">
             Filter Status:&nbsp;&nbsp;
             <select
               value={filterStatus}
-              className="border border-slate-900 rounded py-2 px-3 bg-slate-700 sm:text-sm focus:ring-primary-600 focus:border-primary-600 block p-2.5"
+              className="border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700 sm:text-sm focus:ring-primary-600 focus:border-primary-600 block p-2.5"
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="">All</option>
               <option value="Pending">Pending</option>
               <option value="Rejected">Rejected</option>
               <option value="Approved">Approved</option>
@@ -181,6 +179,8 @@ function WithdrawalsComp() {
                                   className={
                                     transaction.status === "Rejected"
                                       ? "text-center text-red-500 dark:text-red-500"
+                                      : transaction.status === "Pending"
+                                      ? "text-center text-blue-500 dark:text-blue-500"
                                       : "text-center text-green-500 dark:text-green-500"
                                   }
                                 >
@@ -188,49 +188,69 @@ function WithdrawalsComp() {
                                 </div>
                               </td>
                               <td className="p-2">
-                                <div className="text-center flex items-center flex-col gap-2">
-                                  <Link
-                                    to={`/user-details/${user.userId}`}
-                                    className="hidden xs:block ml-2"
-                                  >
-                                    <button className="btn bg-blue-500 hover:bg-blue-600 text-white">
+                                {user &&
+                                JSON.stringify(user.bankDetails) != "{}" ? (
+                                  <div className="text-center flex items-center flex-col gap-2">
+                                    {/* <Link
+                                      to={`/user-details/${user.userId}`}
+                                      className="hidden xs:block ml-2"
+                                    > */}
+                                    <button
+                                      onClick={() =>
+                                        bankDetailFn(user.bankDetails)
+                                      }
+                                      className="btn bg-blue-500 hover:bg-blue-600 text-white"
+                                    >
                                       Bank Details
                                     </button>
-                                  </Link>
-                                </div>
+                                    {/* </Link> */}
+                                  </div>
+                                ) : (
+                                  <div className="text-center flex items-center flex-col gap-2">
+                                    Not available
+                                  </div>
+                                )}
                               </td>
-
-                              <td className="p-2 flex justify-center">
-                                <div
-                                  className="text-center flex items-center flex-col gap-2"
-                                  style={{ width: "130px" }}
-                                >
-                                  <button
-                                    onClick={() =>
-                                      approvePay(user.userId, transaction._id)
-                                    }
-                                    className="btn bg-blue-500 hover:bg-blue-600 text-white"
+                              {transaction.status === "Pending" ? (
+                                <td className="p-2 flex justify-center">
+                                  <div
+                                    className="text-center flex items-center flex-col gap-2"
+                                    style={{ width: "130px" }}
                                   >
-                                    Approve
-                                  </button>
-                                </div>
-                              </td>
+                                    <button
+                                      onClick={() =>
+                                        approvePay(user.userId, transaction._id)
+                                      }
+                                      className="btn bg-blue-500 hover:bg-blue-600 text-white"
+                                    >
+                                      Approve
+                                    </button>
+                                  </div>
 
-                              <td className="p-2 flex justify-center">
-                                <div
-                                  className="text-center flex items-center flex-col gap-2"
-                                  style={{ width: "130px" }}
-                                >
-                                  <button
-                                    onClick={() =>
-                                      rejectPay(user.userId, transaction._id)
-                                    }
-                                    className="btn bg-blue-500 hover:bg-blue-600 text-white"
+                                  <div
+                                    className="text-center flex items-center flex-col gap-2"
+                                    style={{ width: "130px" }}
                                   >
-                                    Reject
-                                  </button>
-                                </div>
-                              </td>
+                                    <button
+                                      onClick={() =>
+                                        rejectPay(user.userId, transaction._id)
+                                      }
+                                      className="btn bg-blue-500 hover:bg-blue-600 text-white"
+                                    >
+                                      Reject
+                                    </button>
+                                  </div>
+                                </td>
+                              ) : (
+                                <td className="pt-4 flex justify-center">
+                                  <div
+                                    className="text-center flex items-center flex-col gap-2"
+                                    style={{ width: "130px" }}
+                                  >
+                                    Already Managed
+                                  </div>
+                                </td>
+                              )}
                             </tr>
                           ))}
                     </tbody>
@@ -239,7 +259,11 @@ function WithdrawalsComp() {
               ))}
         </div>
       </div>
-      <Popup isOpen={isPopupOpen} onClose={closePopup} onSubmit={submitPopup} />
+      <BankDetailsPopup
+        bankDetails={bankDetails}
+        isOpen={isPopupOpen}
+        onClose={closePopup}
+      />
     </div>
   );
 }

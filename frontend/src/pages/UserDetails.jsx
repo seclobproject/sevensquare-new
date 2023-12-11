@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import ModalImage from "react-modal-image";
 
 const UserDetails = () => {
+
   const dispatch = useDispatch();
   const { userId } = useParams();
 

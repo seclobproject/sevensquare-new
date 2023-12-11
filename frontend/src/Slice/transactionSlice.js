@@ -71,7 +71,7 @@ export const verifyTransaction = createAsyncThunk(
 );
 
 export const verifyTransactionSlice = createSlice({
-  name: "get-user",
+  name: "verify-transaction",
   initialState: {
     loading: false,
     data: [],
@@ -117,6 +117,30 @@ export const rejectTransaction = createAsyncThunk(
   }
 );
 
+export const rejectTransactionSlice = createSlice({
+  name: "reject-transaction",
+  initialState: {
+    loading: false,
+    data: [],
+    error: false,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(rejectTransaction.pending, (state) => {
+      state.loading = true;
+      state.error = false;
+    });
+    builder.addCase(rejectTransaction.fulfilled, (state, action) => {
+      state.loading = false;
+      state.data = action.payload;
+    });
+    builder.addCase(rejectTransaction.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+  },
+});
+
 export const getAllTransactions = createAsyncThunk(
   "getAllTransactions",
   async () => {
@@ -141,3 +165,4 @@ export const getAllTransactions = createAsyncThunk(
 
 export const fetchTransactionReducer = fetchTransactionSlice.reducer;
 export const verifyTransactionReducer = verifyTransactionSlice.reducer;
+export const rejectTransactionReducer = rejectTransactionSlice.reducer;

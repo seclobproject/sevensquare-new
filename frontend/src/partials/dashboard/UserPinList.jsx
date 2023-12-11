@@ -17,14 +17,16 @@ function UserPinList() {
 
   const dispatch = useDispatch();
 
-  const { loading, data, error } = useSelector(
-    (state) => state.fetchPinsReducer
-  );
+  const {
+    loading,
+    data,
+    error: fetchPinError,
+  } = useSelector((state) => state.fetchPinsReducer);
 
   let results;
-  if (data) {
+  if (data != null) {
     const groupedResults = data.reduce((result, item) => {
-      const addedBy = item.addedBy._id;
+      const addedBy = item.addedBy && item.addedBy._id || "";
 
       if (!result[addedBy]) {
         result[addedBy] = {
@@ -77,13 +79,13 @@ function UserPinList() {
               name="phone"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search By Name"
-              className="border border-slate-900 rounded py-2 px-3 bg-slate-700 mb-2"
+              className="border dark:border-slate-900 rounded py-2 px-3 dark:bg-slate-700 mb-2"
               required
             />
           </div>
           {/* Table */}
           <div className="overflow-x-auto">
-            {results &&
+            {results ? (
               results
                 .filter((item) => {
                   return search.toLowerCase() === ""
@@ -91,7 +93,7 @@ function UserPinList() {
                     : item.addedBy.name.toLowerCase().includes(search);
                 })
                 .map((pin) => (
-                  <div key={pin && pin.addedBy._id}>
+                  <div key={pin.addedBy && pin.addedBy._id}>
                     <PinOwnerDetails
                       sponserId={pin.addedBy && pin.addedBy.ownSponserId}
                       name={pin.addedBy && pin.addedBy.name}
@@ -99,7 +101,7 @@ function UserPinList() {
                       id={pin.addedBy && pin.addedBy._id}
                       toggleState={toggleState}
                     />
-                    {showPins === pin.addedBy._id && (
+                    {pin.addedBy && showPins === pin.addedBy._id && (
                       <table className="table-auto w-full dark:text-slate-300">
                         <thead className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm">
                           <tr>
@@ -166,7 +168,14 @@ function UserPinList() {
                       </table>
                     )}
                   </div>
-                ))}
+                ))
+            ) : loading ? (
+              <div>Loading...</div>
+            ) : fetchPinError ? (
+              <>Some error occured!</>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>

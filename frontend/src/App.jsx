@@ -22,6 +22,7 @@ import InnerUsers from "./pages/InnerUsers";
 import FranchiseUsers from "./pages/FranchiseUsers";
 import UserPins from "./pages/UserPins";
 import Wallet from "./pages/Wallet";
+import Salary from "./pages/Salary";
 
 function App() {
   const location = useLocation();
@@ -51,6 +52,7 @@ function App() {
         <Route path="/wallet-details" element={<WalletDetails />} />
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/users-list/:userId" element={<InnerUsers />} />
+        <Route path="/salary" element={<Salary />} />
       </Routes>
     </>
   );
