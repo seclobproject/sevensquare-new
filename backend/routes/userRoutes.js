@@ -111,7 +111,7 @@ router.post(
       if (sponserUser) {
         sponserUser.children.push(user._id);
 
-        await giveSalary(user);
+        // await giveSalary(user);
 
         const updatedUser = await sponserUser.save();
 
@@ -434,10 +434,14 @@ router.post(
       user.userStatus = "approved";
       user.imgStatus = "approved";
 
+      // Give salary(14.75) to the sponsor
+      await giveSalary(user);
+
       const updatedUser = await user.save();
 
       if (updatedUser && packageType === "staff") {
         const sponserUser = await User.findById(user.sponser);
+
 
         // Unrealised to wallet start
         if (
